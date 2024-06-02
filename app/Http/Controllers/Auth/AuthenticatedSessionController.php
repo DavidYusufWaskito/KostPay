@@ -30,10 +30,14 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        $guard = $request->authenticate();
 
         $request->session()->regenerate();
 
+        // Redirect based on guard type
+        if ($guard === 'admin') {
+            return redirect()->intended('/admin');
+        }
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
@@ -42,7 +46,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        if (Auth::guard('admin')->check()) {
+            Auth::guard('admin')->logout();
+        } elseif (Auth::guard('web')->check()) {
+            Auth::guard('web')->logout();
+        }
+
 
         $request->session()->invalidate();
 

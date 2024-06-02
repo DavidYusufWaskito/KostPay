@@ -14,6 +14,6 @@ class HomeController extends Controller
 
     public function v_daftar(Request $request)
     {
-        return Inertia::render('Penyewa/Daftar');
+        return Inertia::render('Penyewa/auth/Daftar');
     }
 }

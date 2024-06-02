@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Penyewa;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
-
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 class RegisteredUserController extends Controller
 {
     /**
@@ -31,22 +32,34 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
 
-        $user = User::create([
-            'name' => $request->name,
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|lowercase|email|max:255|unique:'.Penyewa::class,
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            ]);
+        } catch (ValidationException $e) {
+            // Log validation errors for debugging
+            Log::error('Validation failed during user registration', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+    
+            // Redirect back with validation errors
+            return back()->withErrors($e->errors())->withInput();
+        }
+        $user = Penyewa::create([
+            'nama' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        return redirect('/');
     }
 }
