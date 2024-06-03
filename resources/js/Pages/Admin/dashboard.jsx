@@ -4,12 +4,44 @@ import { useEffect, useState } from "react";
 import Navbar from '@/Layouts/Navbar';
 import { faWifi ,faShower, faBed} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { LineChart,ResponsiveContainer,CartesianGrid,XAxis,YAxis,Tooltip,Legend,Line} from "recharts";
 
-export default function AdminDashboard({ auth }) {
+export default function AdminDashboard({ auth, Kamar, Transaksi}) {
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const toggleProfileDropdown = () => {
         setProfileDropdownOpen(!profileDropdownOpen);
     };
+
+    // Check window width and set profile dropdown to false
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setProfileDropdownOpen(false);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    function CustomizedTooltip(props) {
+        const { active } = props;
+
+        if (active) {
+            const { payload } = props;
+            const pendapatan = payload[0]?.value;
+
+            return (
+                <div className="custom-tooltip">
+                    <p className="label">{`Pendapatan: ${new Intl.NumberFormat('id-ID').format(pendapatan)}`}</p>
+                </div>
+            );
+        }
+
+        return null;
+    }
+
     return (
         <div className="overflow-y-auto h-full">
             <Head title="Home" />
@@ -53,8 +85,69 @@ export default function AdminDashboard({ auth }) {
 
             <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    Selamat datang 
-                    {' ' + auth.user.nama}
+                    <div className="bg-white rounded shadow p-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+                            <p className="text-sm text-gray-600">Selamat datang {' ' + auth.user.nama}</p>
+                        </div>
+                    </div>
+                    
+                    
+                    <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+                        <div className="bg-white rounded shadow p-4 hover:shadow-md hover:scale-105 transition-all duration-300">
+                            <div className="text-xl font-semibold text-gray-900">Kamar</div>
+                            <div className="text-2xl font-bold text-gray-900 mt-2">{Kamar.length}</div>
+                            <div className="text-sm text-gray-600 mt-2">Kamar yang terisi: {Kamar.filter(kamar => kamar.StatusKamar === 1).length}</div>
+                            <div className="text-sm text-gray-600 mt-2">Kelola Kamar</div>
+                        </div>
+                        <div className="bg-white rounded shadow p-4 hover:shadow-md hover:scale-105 transition-all duration-300">
+                            <div className="text-xl font-semibold text-gray-900">Penyewa</div>
+                            <div className="text-sm text-gray-600 mt-2">Kelola Penyewa</div>
+                        </div>
+                        <div className="bg-white rounded shadow p-4 hover:shadow-md hover:scale-105 transition-all duration-300">
+                            <div className="text-xl font-semibold text-gray-900">Pendapatan</div>
+                            <div className="text-sm text-gray-600 mt-2">Kelola Pendapatan</div>
+                        </div>
+                    </div>
+                    <div className="mt-4 bg-white rounded shadow p-4">
+                        <div className="text-xl font-semibold text-gray-900">Keuntungan bulanan</div>
+                        <div className="w-full h-64">
+                            <ResponsiveContainer>
+                                <LineChart
+                                    data={Transaksi.reduce((acc, transaksi) => {
+                                        const date = new Date(transaksi.TanggalBayar);
+                                        const year = date.getFullYear();
+                                        const month = date.toLocaleString('default', { month: 'short' });
+                                        const existing = acc.find(item => item.year === year && item.month === month);
+                                        if (existing) {
+                                            existing.profit += transaksi.TotalBayar;
+                                        } else {
+                                            acc.push({
+                                                profit: transaksi.TotalBayar,
+                                                year,
+                                                month,
+                                            });
+                                        }
+                                        return acc;
+                                    }, [])}
+                                    margin={{
+                                        top: 5,
+                                        right: 30,
+                                        left: 20,
+                                        bottom: 5,
+                                    }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="month" />
+                                    <YAxis tickFormatter={(value) => new Intl.NumberFormat('id-ID').format(value)} />
+                                    <Tooltip content={<CustomizedTooltip />} />
+                                    <Line type="monotone" dataKey="profit" stroke="#8884d8" name="Pendapatan" activeDot={{ r: 8 }} />
+                                </LineChart>
+
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

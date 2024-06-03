@@ -57,6 +57,7 @@ Route::middleware('guest')->group(function ()
 
 Route::group(['middleware' => ['auth:admin']],function(){
     Route::get('/admin',[AdminController::class,'index'])->name('admin.dashboard');
+    Route::get('/admin/manage/penyewa',[AdminController::class,'v_ManagePenyewa'])->name('admin.manage.penyewa');
 
 });
 require __DIR__.'/auth.php';

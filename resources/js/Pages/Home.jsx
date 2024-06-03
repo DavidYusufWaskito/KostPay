@@ -11,27 +11,68 @@ export default function Home({ auth }) {
         <div className="overflow-y-auto h-full">
             <Head title="Home" />
             <Navbar className={"bg-[#FFBF69] z-10"}>
-                <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 max-md:border">
+                <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Home
                 </Link>
-                <Link href={route('daftar')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 max-md:border">
+                <Link href={route('daftar')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Daftar
                 </Link>
-                <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 max-md:border">
+                <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Hubungi kami
                 </Link>
             </Navbar>
             <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
-                <div className="bg-slate-500 h-[600px] w-[100vw] text-center">
-                    Karausel
+                <div className="relative w-full overflow-hidden">
+                    <div className="h-[600px]">
+                        <div className="h-full w-full carousel">
+                            <div className="w-full flex transition-transform duration-500 ease-in-out">
+                                <div className="w-full">
+                                    <img className="h-full w-full object-cover" src="https://via.placeholder.com/1920x600" alt="Kost 1" />
+                                </div>
+                                <div className="w-full">
+                                    <img className="h-full w-full object-cover" src="https://via.placeholder.com/1920x600" alt="Kost 2" />
+                                </div>
+                                <div className="w-full">
+                                    <img className="h-full w-full object-cover" src="https://via.placeholder.com/1920x600" alt="Kost 3" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="absolute bottom-0 left-1/2 w-16 h-16 rounded-full bg-white text-gray-500 shadow-lg hover:bg-gray-500 hover:text-white" onClick={() => {
+                        let carousel = document.querySelector('.carousel');
+                        let children = carousel.children[0].children;
+                        let index = Array.from(children).indexOf(children.find(elem => elem.classList.contains('translate-x-0')))
+                        index = (index + 1) % children.length;
+                        children[index].classList.add('translate-x-0');
+                        children[index].classList.remove('-translate-x-full');
+                        children[(index - 1 + children.length) % children.length].classList.add('-translate-x-full');
+                        children[(index - 1 + children.length) % children.length].classList.remove('translate-x-0');
+                    }}>
+                        <FontAwesomeIcon className="text-2xl" icon={faShower}/>
+                    </div>
+                    <div className="absolute bottom-0 right-1/2 w-16 h-16 rounded-full bg-white text-gray-500 shadow-lg hover:bg-gray-500 hover:text-white" onClick={() => {
+                        let carousel = document.querySelector('.carousel');
+                        let children = carousel.children[0].children;
+                        let index = Array.from(children).indexOf(children.find(elem => elem.classList.contains('translate-x-0')))
+                        index = (index - 1 + children.length) % children.length;
+                        children[index].classList.add('translate-x-0');
+                        children[index].classList.remove('-translate-x-full');
+                        children[(index + 1) % children.length].classList.add('-translate-x-full');
+                        children[(index + 1) % children.length].classList.remove('translate-x-0');
+                    }}>
+                        <FontAwesomeIcon className="text-2xl" icon={faBed}/>
+                    </div>
+                    <div className="absolute bottom-0 left-1/2 w-full h-2 bg-gray-500" style={{ transform: 'translateX(calc(50% - 12px))' }}>
+                        <div className="h-full bg-white w-2 transition-transform duration-300 ease-in-out" style={{ transform: 'translateX(calc(50% - 12px))' }}></div>
+                    </div>
                 </div>
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div>
                         <div className="text-xl font-medium text-center pt-5">
                             Selamat datang di kost Bu Yati
                         </div>
-                        <div className="mt-5 flex justify-center items-center gap-10">
-                            <div className="w-[256px] h-[256px] drop-shadow bg-white p-5">
+                        <div className="mt-5 flex justify-center items-center gap-10 flex-col lg:flex-row xl:flex-row ">
+                            <div className="w-[256px] h-[256px] drop-shadow bg-white p-5 rounded">
                                 <div className="flex flex-row w-[64px] h-[64px] items-center justify-center bg-blue-100 rounded">
                                     <FontAwesomeIcon className="text-4xl text-blue-500" icon={faWifi}/>
                                 </div>
@@ -44,7 +85,7 @@ export default function Home({ auth }) {
                                     </p>
                                 </div>
                             </div>
-                            <div className="w-[256px] h-[256px] drop-shadow bg-white p-5">
+                            <div className="w-[256px] h-[256px] drop-shadow bg-white p-5 rounded">
                                 <div className="flex flex-row w-[64px] h-[64px] items-center justify-center bg-blue-100 rounded">
                                     <FontAwesomeIcon className="text-4xl text-blue-500" icon={faShower}/>
                                 </div>
@@ -57,7 +98,7 @@ export default function Home({ auth }) {
                                     </p>
                                 </div>
                             </div>
-                            <div className="w-[256px] h-[256px] drop-shadow bg-white p-5">
+                            <div className="w-[256px] h-[256px] drop-shadow bg-white p-5 rounded">
                                 <div className="flex flex-row w-[64px] h-[64px] items-center justify-center bg-blue-100 rounded">
                                     <FontAwesomeIcon className="text-4xl text-blue-500" icon={faBed}/>
                                 </div>
