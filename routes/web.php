@@ -3,6 +3,9 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PenyewaController;
+use App\Http\Controllers\PenyewaDashboardController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -59,5 +62,22 @@ Route::group(['middleware' => ['auth:admin']],function(){
     Route::get('/admin',[AdminController::class,'index'])->name('admin.dashboard');
     Route::get('/admin/manage/penyewa',[AdminController::class,'v_ManagePenyewa'])->name('admin.manage.penyewa');
 
+
+
+
+    Route::get('/admin/get/penyewa',[PenyewaController::class,'getPenyewa'])->name('admin.get.penyewa');
+
+    Route::post('/admin/manage/penyewa/store',[PenyewaController::class,'storePenyewa'])->name('admin.manage.penyewa.store');
+    Route::post('/admin/manage/penyewa/update',[PenyewaController::class,'updatePenyewa'])->name('admin.manage.penyewa.update');
+    Route::post('/admin/manage/penyewa/delete',[PenyewaController::class,'onDestroy'])->name('admin.manage.penyewa.destroy');
+
 });
+
+
+Route::group(['middleware' => ['auth:web']],function(){
+    Route::get('/penyewa',[PenyewaDashboardController::class,'index'])->name('penyewa.dashboard');
+    Route::post('/penyewa/bayar',[TransactionController::class,'checkOut'])->name('penyewa.bayar');
+    Route::post('/penyewa/transactions',[TransactionController::class,'getTransactions'])->name('penyewa.transactions');
+});
+
 require __DIR__.'/auth.php';

@@ -9,7 +9,9 @@ class Transaksi extends Model
 {
     use HasFactory;
     protected $table = 'transaksi';
+    public $timestamps = false;
     protected $fillable = [
+        'id',
         'idPenyewa',
         'idDetailKamar',
         'TanggalBayar',

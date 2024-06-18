@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Kamar;
+use App\Models\Penyewa;
+use App\Models\Admin;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,11 +14,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        Admin::factory()->create();
+        Penyewa::factory()->create();
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        Kamar::factory(3)->create([
+            'HargaSewa' => 700000,
+            'StatusKamar' => 0
+        ]);
     }
 }
+
+// cara pakai seeder ini di php artisan
+// php artisan db:seed --class=DatabaseSeeder

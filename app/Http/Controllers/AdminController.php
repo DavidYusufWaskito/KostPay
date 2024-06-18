@@ -21,8 +21,7 @@ class AdminController extends Controller
 
     public function v_ManagePenyewa(Request $request)
     {
-        $Penyewa = Penyewa::all();
         $DetailKamar = DetailKamar::all();
-        return Inertia::render('Admin/Penyewa/managePenyewa',['Penyewa' => $Penyewa,'DetailKamar' => $DetailKamar]);
+        return Inertia::render('Admin/Penyewa/managePenyewa',['DetailKamar' => $DetailKamar]);
     }
 }

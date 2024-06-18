@@ -10,6 +10,8 @@ class Kamar extends Model
     use HasFactory;
 
     protected $table = 'kamar';
+    
+    public $timestamps = false;
     protected $fillable = [
         'HargaSewa',
         'StatusKamar'

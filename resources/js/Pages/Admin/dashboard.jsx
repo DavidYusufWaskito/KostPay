@@ -102,7 +102,7 @@ export default function AdminDashboard({ auth, Kamar, Transaksi}) {
                         </div>
                         <div className="bg-white rounded shadow p-4 hover:shadow-md hover:scale-105 transition-all duration-300">
                             <div className="text-xl font-semibold text-gray-900">Penyewa</div>
-                            <div className="text-sm text-gray-600 mt-2">Kelola Penyewa</div>
+                            <Link href={route('admin.manage.penyewa')} className="text-sm text-gray-600 mt-2">Kelola Penyewa</Link>
                         </div>
                         <div className="bg-white rounded shadow p-4 hover:shadow-md hover:scale-105 transition-all duration-300">
                             <div className="text-xl font-semibold text-gray-900">Pendapatan</div>
@@ -114,22 +114,22 @@ export default function AdminDashboard({ auth, Kamar, Transaksi}) {
                         <div className="w-full h-64">
                             <ResponsiveContainer>
                                 <LineChart
-                                    data={Transaksi.reduce((acc, transaksi) => {
-                                        const date = new Date(transaksi.TanggalBayar);
+                                    data={Array.from({length: 12}, (_, i) => {
+                                        const date = new Date(new Date().getFullYear(), i, 1);
                                         const year = date.getFullYear();
                                         const month = date.toLocaleString('default', { month: 'short' });
-                                        const existing = acc.find(item => item.year === year && item.month === month);
-                                        if (existing) {
-                                            existing.profit += transaksi.TotalBayar;
-                                        } else {
-                                            acc.push({
-                                                profit: transaksi.TotalBayar,
-                                                year,
-                                                month,
-                                            });
-                                        }
-                                        return acc;
-                                    }, [])}
+                                        return {
+                                            profit: Transaksi.reduce((acc, transaksi) => {
+                                                const tDate = new Date(transaksi.TanggalBayar);
+                                                if (tDate.getMonth() === i && tDate.getFullYear() === year) {
+                                                    acc += transaksi.TotalBayar;
+                                                }
+                                                return acc;
+                                            }, null),
+                                            year,
+                                            month,
+                                        };
+                                    })}
                                     margin={{
                                         top: 5,
                                         right: 30,
@@ -141,7 +141,7 @@ export default function AdminDashboard({ auth, Kamar, Transaksi}) {
                                     <XAxis dataKey="month" />
                                     <YAxis tickFormatter={(value) => new Intl.NumberFormat('id-ID').format(value)} />
                                     <Tooltip content={<CustomizedTooltip />} />
-                                    <Line type="monotone" dataKey="profit" stroke="#8884d8" name="Pendapatan" activeDot={{ r: 8 }} />
+                                    <Line connectNulls type="monotone" dataKey="profit" stroke="#8884d8" name="Pendapatan" activeDot={{ r: 8 }} />
                                 </LineChart>
 
                             </ResponsiveContainer>
