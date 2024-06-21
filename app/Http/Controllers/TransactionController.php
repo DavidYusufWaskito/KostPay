@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use App\Models\Transaksi;
 use Illuminate\Support\Facades\Log;
 use App\Models\DetailKamar;
 use App\Models\Penyewa;
+use PhpParser\JsonDecoder;
+
 class TransactionController extends Controller
 {
     // Harusnya jangan bikin data transaksi dulu di database
@@ -14,12 +17,21 @@ class TransactionController extends Controller
     {
         try {
 
+            // Cari transaksi yang status pembayaran nya 5 (Belum dibayar), jika ada response error
+            $transaction = Transaksi::where('StatusPembayaran', 5)
+                ->where('idPenyewa', auth()->user()->id)
+                ->first();
+            if ($transaction) {
+                return response()->json(['error' => 'Selesaikan transaksi terlebih dahulu (Id transaksi: '.$transaction->id.', total: Rp. '. $transaction->TotalBayar . ')'], 400);
+            }
+
             if ($request->TotalBayar > auth()->user()->tunggakan) {
                 return response()->json(['error' => 'Total Bayar melebihi tunggakan'], 400);
             }
             elseif ($request->TotalBayar == 0) {
                 return response()->json(['error' => 'Total Bayar tidak boleh 0'], 400);
             }
+            
             
             $idPenyewa = auth()->user()->id;
             $tanggal = date('Ymd');
@@ -185,9 +197,38 @@ class TransactionController extends Controller
     // }
 
     
+    // Perlu di optimisasi lagi, soal nya ini dia ngerequest setiap user refresh
     public function getTransactions(Request $request)
-    {
+    {   
+        $AuthString = 'Basic '.base64_encode(config('midtrans.server_key').':');
+        Log::info("Auth string: " . $AuthString);
         $transactions = Transaksi::where('idPenyewa', $request->id)->orderBy('TanggalBayar', 'desc')->get();
+        
+        // foreach($transactions as $transaction){
+            
+        //     $TransactionStatusResponse = http::withHeaders([
+        //         'Accept' => 'application/json',
+        //         'Content-Type' => 'application/json',
+        //         'Authorization' => $AuthString,
+        //     ])->get('https://api.sandbox.midtrans.com/v2/'. $transaction->id .'/status');
+        //     $transactionStatus = $TransactionStatusResponse->json('transaction_status');
+        //     $statusToUpdate = match($transactionStatus) {
+        //         'capture', 'settlement' => 1,
+        //         'pending' => 2,
+        //         'failure' => 0,
+        //         'expire' => 4,
+        //         'cancel' => 3,
+        //         'deny' => 0,
+        //         default => null,
+        //     };
+        //     if($statusToUpdate !== null){
+        //         $transaction->update(['StatusPembayaran' => $statusToUpdate]);
+        //         Log::info('Status transaksi diupdate: ' . $transactionStatus);
+        //     }else{
+        //         Log::warning('Status transaksi tidak dikenali: ' . $transactionStatus);
+        //     }
+
+        // }
         return response()->json($transactions);
     }
 

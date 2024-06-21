@@ -1,34 +1,28 @@
 import { Head, Link } from "@inertiajs/react";
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useEffect, useState } from "react";
-import Navbar from '@/Layouts/Navbar';
-import { faWifi ,faShower, faBed} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import PenyewaHeader from "@/Layouts/Penyewa/PenyewaHeader";
 import DataTable from "react-data-table-component";
 import CustomPaginationComponent from "@/Components/DatatableComponent/CustomPagination";
 import Modal from "@/Components/Modal";
-import TextInput from "@/Components/TextInput";
 import NumberInput from "@/Components/NumberInput";
 import StatusPembayaran from "@/Components/DatatableComponent/StatusPembayaran";
+import CustomLoading from "@/Components/DatatableComponent/CustomLoading";
+import { useMidtrans } from "@/Components/useMidtrans";
+
 export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIENT_KEY}) {
     const [TransactionData, setTransactionData] = useState([]);
-    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const [showBayarModal, setShowBayarModal] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [currentPage, setCurrentPage] = useState(1);
+    const [TablePending,setTablePending] = useState(true);
 
 
     const [paymentData,setPaymentData] = useState({
         TotalBayar: 0,
         idDetailKamar:DetailKamar.id
     })
-
-
-    const toggleProfileDropdown = () => {
-        setProfileDropdownOpen(!profileDropdownOpen);
-    };
 
     const handleSearch = (event) => {
         setSearchQuery(event.target.value);
@@ -53,42 +47,12 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
     // Mengambil data yang diperlukan berdasarkan jumlah baris per halaman dan halaman saat ini
     const paginatedData = filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
-    // Check window width and set profile dropdown to false
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 768) {
-                setProfileDropdownOpen(false);
-            }
-        };
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
     // Fetching transaction data
     useEffect(() => {
         getTransactions();
     },[])
-    useEffect(() => {
-        // You can also change below url value to any script url you wish to load, 
-        // for example this is snap.js for Sandbox Env (Note: remove `.sandbox` from url if you want to use production version)
-        const midtransScriptUrl = 'https://app.sandbox.midtrans.com/snap/snap.js';  
-      
-        let scriptTag = document.createElement('script');
-        scriptTag.src = midtransScriptUrl;
-      
-        // Optional: set script attribute, for example snap.js have data-client-key attribute 
-        // (change the value according to your client-key)
-        const myMidtransClientKey = MIDTRANS_CLIENT_KEY;
-        scriptTag.setAttribute('data-client-key', myMidtransClientKey);
-      
-        document.body.appendChild(scriptTag);
-        
-        return () => {
-          document.body.removeChild(scriptTag);
-        }
-      }, []);
 
+    useMidtrans(MIDTRANS_CLIENT_KEY);
       
     const getSnapToken = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
@@ -111,7 +75,24 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
         const responseJSON = await response.json();
         console.log(responseJSON);
         if (response.ok) {
-            window.snap.pay(responseJSON.snapToken);
+            window.snap.pay(responseJSON.snapToken,{
+                onSuccess: function(result){
+                    /* You may add your own implementation here */
+                    alert("Pembayaran berhasil!"); console.log(result);
+                },
+                onPending: function(result){
+                    /* You may add your own implementation here */
+                    alert("Menunggu pembayaran!"); console.log(result);
+                },
+                onError: function(result){
+                    /* You may add your own implementation here */
+                    alert("Pembayaran gagal!"); console.log(result);
+                },
+                onClose: function(){
+                    /* You may add your own implementation here */
+                    alert('Kamu belum bayar loh!, silahkan klik kolom riwayat transaksi yang berstatus belum bayar untuk membayar tagihanmu!');
+                }
+            });
         }
         else{
             alert(responseJSON.error);
@@ -134,6 +115,7 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
         const responseJSON = await response.json();
         console.log(responseJSON);
         setTransactionData((e) => {return responseJSON});
+        setTablePending(false);
         console.log(TransactionData)
       }
 
@@ -142,11 +124,7 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
         getSnapToken();
       }
       
-      // Panggil fungsi handleBayarClick saat tombol bayar diklik
       
-      // Then somewhere else on your React component, `window.snap` global object will be available to use
-      // e.g. you can then call `window.snap.pay( ... )` function.
-
     const getNumber = (_str) => {
         const arr = _str.split('');
         const out = arr.filter(c => !isNaN(c)).join('');
@@ -156,41 +134,7 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
 
     return (
         <div className="overflow-y-auto h-full">
-            <Head title="Home" />
-            <Navbar className={"bg-[#FFBF69] z-10"}>
-                <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
-                    Dashboard
-                </Link>
-                <Link href={route('daftar')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
-                    Riwayat transaksi
-                </Link>
-                <button onClick={toggleProfileDropdown} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 max-md:hidden" id="menu-button" aria-expanded={profileDropdownOpen} aria-haspopup="true">
-                    Profil
-                </button>
-                <div className="max-md:border-t-[1px]">
-                    <div className="max-md:text-slate-500/50 max-md:pt-1 max-md:ps-2 text-sm hidden max-md:block">
-                        Profile
-                    </div>
-                    <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 hidden max-md:block ">
-                        Account settings
-                    </Link>
-                    <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 hidden max-md:block " method="post" href={route('logout')}>
-                        Sign out
-                    </Link>
-                </div>
-            </Navbar>
-
-            {/* Dropdown profil */}
-            {profileDropdownOpen && (
-                <div className="absolute right-0 z-10 mt-20 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex="-1">
-                    <div className="py-1" role="none">
-                        <Link href="#" className="text-gray-700 block px-4 py-2 text-sm hover:text-[#EB5160]" role="menuitem" tabIndex="-1" id="menu-item-0">Account settings</Link>
-                        <Link className="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:text-[#EB5160]" method="post" href={route('logout')} as="button">
-                            Sign out
-                        </Link>
-                    </div>
-                </div>
-            )}
+            <PenyewaHeader auth={auth}/>
 
             <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -242,11 +186,11 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
                                 </div>
                             </div>
                         )}
-                        <button onClick={() => setShowBayarModal(true)} className="rounded before:ease relative h-12 w-40 overflow-hidden border border-green-500 bg-green-500 text-white transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:before:-translate-x-40">Bayar</button>
+                        <button onClick={() => setShowBayarModal(true)} className="rounded before:ease relative h-12 w-full overflow-hidden border border-green-500 bg-green-500 text-white transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:before:-translate-x-40">Bayar</button>
                     </div>
                     
-                    <Modal show={showBayarModal} onClose={() => setShowBayarModal(false)} title="Bayar Tagihan">
-                        <div className="bg-white rounded-lg shadow-lg p-4">
+                    <Modal show={showBayarModal} onClose={() => setShowBayarModal(false)} className={'overflow-auto'} title="Bayar Tagihan">
+                        <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto max-h-[95vh]">
                             <div className="space-y-4">
                                 {/* Jumlah tagihan */}
                                 <div className=" text-center">
@@ -380,8 +324,31 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
                             pagination
                             highlightOnHover
                             striped
+                            progressPending={TablePending}
+                            progressComponent={
+                                <CustomLoading/>
+                            }
                             pointerOnHover
-                            onRowClicked={(row) => window.snap.pay(row.snapToken)}
+                            onRowClicked={(row) => window.snap.pay(row.snapToken,
+                                {
+                                    onSuccess: function(result){
+                                        /* You may add your own implementation here */
+                                        alert("Pembayaran berhasil!"); console.log(result);
+                                    },
+                                    onPending: function(result){
+                                        /* You may add your own implementation here */
+                                        alert("Menunggu pembayaran!"); console.log(result);
+                                    },
+                                    onError: function(result){
+                                        /* You may add your own implementation here */
+                                        alert("Pembayaran gagal!"); console.log(result);
+                                    },
+                                    onClose: function(){
+                                        /* You may add your own implementation here */
+                                        alert('Kamu belum bayar loh!, silahkan klik kolom riwayat transaksi yang berstatus belum bayar untuk membayar tagihanmu!');
+                                    }
+                                }
+                            )}
                             paginationServer
                             paginationComponent={() => (
                                 <CustomPaginationComponent
