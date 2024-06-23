@@ -1,5 +1,5 @@
 
-export default function CustomLoading()
+export default function CustomLoading({ loadingText = 'Memuat data...' })
 {
     return (
         <>
@@ -11,7 +11,7 @@ export default function CustomLoading()
                 </svg>
                 {/* <span className="sr-only">Memuat data...</span> */}
                 <div className="text-center">
-                    Memuat data....
+                    {loadingText}
                 </div>
             </div>
 

@@ -71,13 +71,16 @@ Route::group(['middleware' => ['auth:admin']],function(){
     Route::post('/admin/manage/penyewa/update',[PenyewaController::class,'updatePenyewa'])->name('admin.manage.penyewa.update');
     Route::post('/admin/manage/penyewa/delete',[PenyewaController::class,'onDestroy'])->name('admin.manage.penyewa.destroy');
 
+    Route::get('/admin/manage/transaksi',[AdminController::class,'v_ManageTransaksi'])->name('admin.manage.transaksi');
+    Route::post('/admin/get/all/transaksi',[TransactionController::class,'getAllTransaction'])->name('admin.get.all.transaction');
+    Route::post('/admin/sync/all/transaksi',[TransactionController::class,'syncAllTransaction'])->name('admin.sync.all.transaction');
 });
 
 
 Route::group(['middleware' => ['auth:web']],function(){
     Route::get('/penyewa',[PenyewaDashboardController::class,'index'])->name('penyewa.dashboard');
     Route::post('/penyewa/bayar',[TransactionController::class,'checkOut'])->name('penyewa.bayar');
-    Route::post('/penyewa/transactions',[TransactionController::class,'getTransactions'])->name('penyewa.transactions');
+    Route::post('/penyewa/transactions',[TransactionController::class,'getTransactionsByIdPenyewa'])->name('penyewa.transactions');
 });
 
 require __DIR__.'/auth.php';
