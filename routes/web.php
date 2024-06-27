@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PenyewaController;
 use App\Http\Controllers\PenyewaDashboardController;
 use App\Http\Controllers\TransactionController;
@@ -63,7 +64,8 @@ Route::group(['middleware' => ['auth:admin']],function(){
     Route::get('/admin/manage/penyewa',[AdminController::class,'v_ManagePenyewa'])->name('admin.manage.penyewa');
 
 
-
+    Route::get('/admin/notif',[AdminController::class,'v_Notifikasi'])->name('admin.notifikasi');
+    Route::post('/admin/send/notif',[NotificationController::class,'sendNotif']);
 
     Route::get('/admin/get/penyewa',[PenyewaController::class,'getPenyewa'])->name('admin.get.penyewa');
 
@@ -81,6 +83,7 @@ Route::group(['middleware' => ['auth:web']],function(){
     Route::get('/penyewa',[PenyewaDashboardController::class,'index'])->name('penyewa.dashboard');
     Route::post('/penyewa/bayar',[TransactionController::class,'checkOut'])->name('penyewa.bayar');
     Route::post('/penyewa/transactions',[TransactionController::class,'getTransactionsByIdPenyewa'])->name('penyewa.transactions');
+    Route::post('/notifikasi',[NotificationController::class,'getNotifByPenyewa']);
 });
 
 require __DIR__.'/auth.php';

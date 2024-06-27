@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('Pesan');
             $table->foreignId('idPenyewa')->constrained('penyewa');
             $table->foreignId('idAdmin')->constrained('admin');
+            $table->integer('status');
             $table->timestamps();
         });
     }
