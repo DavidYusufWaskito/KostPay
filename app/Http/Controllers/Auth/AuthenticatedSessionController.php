@@ -25,6 +25,14 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
+    public function createAdmin(): Response
+    {
+        return Inertia::render('Auth/LoginAdmin', [
+            'canResetPassword' => Route::has('password.request'),
+            'status' => session('status'),
+        ]);
+    }
+
     /**
      * Handle an incoming authentication request.
      */

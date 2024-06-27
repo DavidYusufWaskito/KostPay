@@ -17,6 +17,9 @@ export default function Home({ auth }) {
                 <Link href={route('daftar')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Daftar
                 </Link>
+                <Link href={route('login')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                    Login
+                </Link>
                 <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Hubungi kami
                 </Link>

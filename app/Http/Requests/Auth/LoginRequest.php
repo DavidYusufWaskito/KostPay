@@ -59,16 +59,24 @@ class LoginRequest extends FormRequest
         // }
 
         // RateLimiter::clear($this->throttleKey());
-        if (Auth::guard('web')->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            // $this->session()->regenerate();
-            RateLimiter::clear($this->throttleKey());
-            return 'web';
+
+        if ($this->form === 'admin') {
+            if (Auth::guard('admin')->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+                // $this->session()->regenerate();
+                RateLimiter::clear($this->throttleKey());
+                return 'admin';
+            }
+
         }
-        if (Auth::guard('admin')->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            // $this->session()->regenerate();
-            RateLimiter::clear($this->throttleKey());
-            return 'admin';
+        else{
+            if (Auth::guard('web')->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+                // $this->session()->regenerate();
+                RateLimiter::clear($this->throttleKey());
+                return 'web';
+            }
         }
+
+        
         RateLimiter::hit($this->throttleKey());
     
         throw ValidationException::withMessages([

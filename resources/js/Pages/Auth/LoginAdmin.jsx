@@ -12,7 +12,7 @@ export default function Login({ status, canResetPassword }) {
         email: '',
         password: '',
         remember: false,
-        form:'penyewa'
+        form:'admin'
     });
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export default function Login({ status, canResetPassword }) {
 
             <div className="card mx-auto max-w-md">
                 <div className="card-body">
-                    <h2 className="card-title text-center mb-4">Login Penyewa</h2>
+                    <h2 className="card-title text-center mb-4">Login Admin</h2>
 
                     {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
 

@@ -22,17 +22,16 @@ class TransactionController extends Controller
                 ->where('idPenyewa', auth()->user()->id)
                 ->first();
             if ($transaction) {
-                return response()->json(['error' => 'Selesaikan transaksi terlebih dahulu (Id transaksi: '.$transaction->id.', total: Rp. '. $transaction->TotalBayar . ')'], 400);
+                return response()->json(['error' => 'Selesaikan transaksi terlebih dahulu (Id transaksi: ' . $transaction->id . ', total: Rp. ' . $transaction->TotalBayar . ')'], 400);
             }
 
             if ($request->TotalBayar > auth()->user()->tunggakan) {
                 return response()->json(['error' => 'Total Bayar melebihi tunggakan'], 400);
-            }
-            elseif ($request->TotalBayar == 0) {
+            } elseif ($request->TotalBayar == 0) {
                 return response()->json(['error' => 'Total Bayar tidak boleh 0'], 400);
             }
-            
-            
+
+
             $idPenyewa = auth()->user()->id;
             $tanggal = date('Ymd');
             $jam = date('His');
@@ -44,12 +43,12 @@ class TransactionController extends Controller
             $Transaksi->TanggalBayar = date('Y-m-d H:i:s');
             $Transaksi->TotalBayar = $request->TotalBayar;
             $Transaksi->StatusPembayaran = 5;
-    
+
             \Midtrans\Config::$serverKey = config('midtrans.server_key');
             \Midtrans\Config::$isProduction = false;
             \Midtrans\Config::$isSanitized = true;
             \Midtrans\Config::$is3ds = true;
-    
+
             $params = array(
                 'transaction_details' => array(
                     'order_id' => $Transaksi->id,
@@ -60,22 +59,22 @@ class TransactionController extends Controller
                     'email' => auth()->user()->email
                 ),
             );
-    
+
             $snapToken = \Midtrans\Snap::getSnapToken($params);
 
             $Transaksi->snapToken = $snapToken;
             $Transaksi->save();
-    
+
             return response()->json(['snapToken' => $snapToken], 200);
         } catch (\Exception $e) {
             // Log the error message
             Log::error('Error generating snap token: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
-    
+
             return response()->json(['error' => 'Failed to generate snap token'], 500);
         }
     }
-    
+
     public function midtransCallback(Request $request)
     {
         $serverKey = config('midtrans.server_key');
@@ -93,8 +92,7 @@ class TransactionController extends Controller
 
             // Update status transaksi berdasarkan status dari Midtrans
             switch ($request->transaction_status) {
-                case 'capture':
-                    {
+                case 'capture': {
                         $Transaksi->update(['StatusPembayaran' => 1]);
                         Log::info('Payment captured successfully for Order ID: ' . $request->order_id);
                     }
@@ -196,16 +194,16 @@ class TransactionController extends Controller
     //     }
     // }
 
-    
+
     // Perlu di optimisasi lagi, soal nya ini dia ngerequest setiap user refresh
-    public function getTransactions(Request $request)
-    {   
-        $AuthString = 'Basic '.base64_encode(config('midtrans.server_key').':');
+    public function getTransactionsByIdPenyewa(Request $request)
+    {
+        $AuthString = 'Basic ' . base64_encode(config('midtrans.server_key') . ':');
         Log::info("Auth string: " . $AuthString);
         $transactions = Transaksi::where('idPenyewa', $request->id)->orderBy('TanggalBayar', 'desc')->get();
-        
+
         // foreach($transactions as $transaction){
-            
+
         //     $TransactionStatusResponse = http::withHeaders([
         //         'Accept' => 'application/json',
         //         'Content-Type' => 'application/json',
@@ -232,4 +230,44 @@ class TransactionController extends Controller
         return response()->json($transactions);
     }
 
+    public function getAllTransaction(Request $request)
+    {
+        $transaction = Transaksi::all();
+        Log::info('Page requesting all transaction)');
+        return response()->json($transaction);
+    }
+
+    public function syncAllTransaction(Request $request)
+    {
+
+        $AuthString = 'Basic ' . base64_encode(config('midtrans.server_key') . ':');
+        Log::info("Auth string: " . $AuthString);
+        $transactions = Transaksi::all();
+        foreach ($transactions as $transaction) {
+
+            $TransactionStatusResponse = http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => $AuthString,
+            ])->get('https://api.sandbox.midtrans.com/v2/' . $transaction->id . '/status');
+            $transactionStatus = $TransactionStatusResponse->json('transaction_status');
+            $statusToUpdate = match ($transactionStatus) {
+                'capture', 'settlement' => 1,
+                'pending' => 2,
+                'failure' => 0,
+                'expire' => 4,
+                'cancel' => 3,
+                'deny' => 0,
+                default => null,
+            };
+            if ($statusToUpdate !== null) {
+                $transaction->update(['StatusPembayaran' => $statusToUpdate]);
+                Log::info('Status transaksi diupdate: ' . $transactionStatus);
+            } else {
+                Log::warning('Status transaksi tidak dikenali: ' . $transactionStatus);
+            }
+        }
+
+        return response()->json($transactions);
+    }
 }
