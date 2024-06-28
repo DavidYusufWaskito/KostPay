@@ -83,7 +83,12 @@ Route::group(['middleware' => ['auth:web']],function(){
     Route::get('/penyewa',[PenyewaDashboardController::class,'index'])->name('penyewa.dashboard');
     Route::post('/penyewa/bayar',[TransactionController::class,'checkOut'])->name('penyewa.bayar');
     Route::post('/penyewa/transactions',[TransactionController::class,'getTransactionsByIdPenyewa'])->name('penyewa.transactions');
+});
+Route::group(['middleware' => ['auth:web,admin']],function(){
+    
     Route::post('/notifikasi',[NotificationController::class,'getNotifByPenyewa']);
+    Route::post('/notifikasi/change/status',[NotificationController::class,'changeNotifStatus']);
+    Route::post('/notifikasi/change/status/all',[NotificationController::class,'changeAllNotifStatusByPenyewa']);
 });
 
 require __DIR__.'/auth.php';
