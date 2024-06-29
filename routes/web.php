@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\MessageEvent;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
@@ -23,12 +24,18 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
+    
     return Inertia::render('Home', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
+});
+
+Route::get('/msg',function()
+{
+    MessageEvent::dispatch('Hello World');
 });
 
 Route::get('/dashboard', function () {

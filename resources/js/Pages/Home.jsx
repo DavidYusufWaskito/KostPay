@@ -5,7 +5,12 @@ import Navbar from '@/Layouts/Navbar';
 import { faWifi ,faShower, faBed} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+
 export default function Home({ auth }) {
+
+   window.Echo.channel('messagechannel.').listen('MessageEvent',(e) => {
+       console.log(e);
+   })
 
     return (
         <div className="overflow-y-auto h-full">

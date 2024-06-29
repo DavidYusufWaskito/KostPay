@@ -41,6 +41,11 @@ export default function PenyewaHeader({ children , auth}) {
         setNotificationsOpen(!notificationsOpen);
     }
 
+    window.Echo.private('notificationchannel.'+auth.user.id).listen('NotificationEvent', (e) => {
+        console.log(e);
+        fetchNotif();
+    });
+
     const fetchNotif = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
         const requestConfig = {

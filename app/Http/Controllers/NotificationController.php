@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationEvent;
 use Illuminate\Http\Request;
 use App\Models\Notifikasi;
 
@@ -17,6 +18,7 @@ class NotificationController extends Controller
             $notification->status = 0;
             $notification->idAdmin = $request->idAdmin;
             $notification->save();
+            NotificationEvent::dispatch('Notification sended!', $request->idPenyewa);
             return response()->json(['message' => 'Notifikasi berhasil dikirim'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi Kesalahan: ' . $e->getMessage()], 400);

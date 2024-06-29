@@ -67,7 +67,10 @@ export default function sendNotifikasi({ auth }) {
             // alert("Notifikasi Terkirim");
             setAlertOpen({open: true, message: responseJSON.message, severity: "success"});
 
-
+            setFormData({
+                idAdmin: auth.user.id,
+                Pesan:"",
+            });
         }
         else
         {
@@ -80,7 +83,7 @@ export default function sendNotifikasi({ auth }) {
             <div className="overflow-y-auto h-full">
                 <AdminHeader auth={auth} />
 
-                <Snackbar open={alertOpen.open} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} autoHideDuration={6000} onClose={() => setAlertOpen(...alertOpen, {open: false, message: "", severity: ""})}>
+                <Snackbar open={alertOpen.open} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} autoHideDuration={5000} onClose={() => setAlertOpen({open: false, message: "", severity: ""})}>
                     <Alert severity={alertOpen.severity}>{alertOpen.message}</Alert>
                 </Snackbar>
                 <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
@@ -91,7 +94,11 @@ export default function sendNotifikasi({ auth }) {
                                 <h1 className="text-2xl text-center font-semibold text-gray-800">Kirim Notifikasi</h1>
                             </div>
                             <div>
-                                <form onSubmit={sendNotifikasi}>
+                                <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    sendNotifikasi();
+                                
+                                }}>
                                     <div className="flex flex-col">
                                         <label className="text-xl">
                                             <span>Pilih Penyewa</span>
@@ -111,7 +118,7 @@ export default function sendNotifikasi({ auth }) {
                                         <label className="text-xl">
                                             <span>Isi Pesan</span>
                                         </label>
-                                        <textarea name="message" id="message" className="rounded h-24 w-full" required onChange={(e) => setFormData({ ...formData, Pesan: e.target.value })} placeholder="Masukkan pesan notifikasi"></textarea>
+                                        <textarea name="message" id="message" className="rounded h-24 w-full" required value={formData.Pesan} onChange={(e) => setFormData({ ...formData, Pesan: e.target.value })} placeholder="Masukkan pesan notifikasi"></textarea>
                                     </div>
                                     <button className="bg-blue-500 px-5 py-2 rounded-lg text-white font-semibold mt-4">Kirim</button>
                                 </form>
