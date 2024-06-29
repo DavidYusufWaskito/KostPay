@@ -11,6 +11,7 @@ class NotificationController extends Controller
     //
     public function sendNotif (Request $request)
     {
+        NotificationEvent::dispatch('Notification sended!', $request->idPenyewa);
         try {
             $notification = new Notifikasi();
             $notification->idPenyewa = $request->idPenyewa;
@@ -18,7 +19,6 @@ class NotificationController extends Controller
             $notification->status = 0;
             $notification->idAdmin = $request->idAdmin;
             $notification->save();
-            NotificationEvent::dispatch('Notification sended!', $request->idPenyewa);
             return response()->json(['message' => 'Notifikasi berhasil dikirim'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi Kesalahan: ' . $e->getMessage()], 400);

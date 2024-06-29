@@ -67,7 +67,7 @@ export default function sendNotifikasi({ auth }) {
             // alert("Notifikasi Terkirim");
             setAlertOpen({open: true, message: responseJSON.message, severity: "success"});
 
-            setFormData({
+            setFormData({ ...formData ,
                 idAdmin: auth.user.id,
                 Pesan:"",
             });
@@ -97,13 +97,13 @@ export default function sendNotifikasi({ auth }) {
                                 <form onSubmit={(e) => {
                                     e.preventDefault();
                                     sendNotifikasi();
-                                
+                                    console.log(formData);
                                 }}>
                                     <div className="flex flex-col">
                                         <label className="text-xl">
                                             <span>Pilih Penyewa</span>
                                         </label>
-                                        <select onChange={(e) => setFormData({ ...formData, idPenyewa: e.target.value })} required className=" rounded-lg w-[20%]">
+                                        <select onChange={(e) => setFormData({ ...formData ,idPenyewa: e.target.value })} required className=" rounded-lg w-[20%]">
                                             <option key={0}>Pilih Penyewa</option>
                                             {
                                                 penyewaData && (
@@ -118,7 +118,7 @@ export default function sendNotifikasi({ auth }) {
                                         <label className="text-xl">
                                             <span>Isi Pesan</span>
                                         </label>
-                                        <textarea name="message" id="message" className="rounded h-24 w-full" required value={formData.Pesan} onChange={(e) => setFormData({ ...formData, Pesan: e.target.value })} placeholder="Masukkan pesan notifikasi"></textarea>
+                                        <textarea name="message" id="message" className="rounded h-24 w-full" required value={formData.Pesan} onChange={(e) => setFormData({  ...formData ,Pesan: e.target.value })} placeholder="Masukkan pesan notifikasi"></textarea>
                                     </div>
                                     <button className="bg-blue-500 px-5 py-2 rounded-lg text-white font-semibold mt-4">Kirim</button>
                                 </form>

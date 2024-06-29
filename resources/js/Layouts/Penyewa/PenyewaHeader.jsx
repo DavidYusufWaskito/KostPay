@@ -40,11 +40,23 @@ export default function PenyewaHeader({ children , auth}) {
     const toggleNotifications = () => {
         setNotificationsOpen(!notificationsOpen);
     }
+    // Listen notifikasi
+    useEffect(() => {
+        var channel = window.Echo.private('notificationchannel.'+auth.user.id);
 
-    window.Echo.private('notificationchannel.'+auth.user.id).listen('NotificationEvent', (e) => {
-        console.log(e);
-        fetchNotif();
-    });
+        const listener = (e) => {
+            console.log(e);
+            fetchNotif();
+        };
+
+        channel.listen('NotificationEvent', listener);
+
+        return () => {
+            channel.stopListening('NotificationEvent', listener);
+        };
+        
+    },[auth.user.id])
+
 
     const fetchNotif = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
