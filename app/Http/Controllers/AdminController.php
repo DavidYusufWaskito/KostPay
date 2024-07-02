@@ -29,4 +29,9 @@ class AdminController extends Controller
     {
         return Inertia::render('Admin/Transaksi/manageTransaksi');
     }
+
+    public function v_Notifikasi(Request $request)
+    {
+        return Inertia::render('Admin/notifikasi/sendnotifikasi');
+    }
 }

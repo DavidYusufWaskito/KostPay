@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Notifikasi extends Model
 {
     use HasFactory;
+    protected $table = 'notifikasi';
+    protected $fillable = [
+        'idPenyewa',
+        'idAdmin',
+        'Pesan',
+        'status',
+    ];
 }

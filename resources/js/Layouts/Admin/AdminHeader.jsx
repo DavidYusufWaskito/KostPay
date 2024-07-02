@@ -32,6 +32,9 @@ export default function AdminHeader({ children, auth }) {
                 <Link href={route('admin.manage.penyewa')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Manage penyewa
                 </Link>
+                <Link href={route('admin.notifikasi')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                    Kirim notifikasi
+                </Link>
                 <button onClick={toggleProfileDropdown} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 max-md:hidden" id="menu-button" aria-expanded={profileDropdownOpen} aria-haspopup="true">
                     Profil
                 </button>
