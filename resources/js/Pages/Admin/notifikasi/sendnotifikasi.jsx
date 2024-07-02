@@ -17,7 +17,9 @@ export default function sendNotifikasi({ auth }) {
         idAdmin: auth.user.id,
         Pesan:"",
 
-    })
+    });
+
+    const [msgLength, setMsgLength] = useState(0);
 
     useEffect(() => {
         fetchPenyewa();
@@ -118,7 +120,18 @@ export default function sendNotifikasi({ auth }) {
                                         <label className="text-xl">
                                             <span>Isi Pesan</span>
                                         </label>
-                                        <textarea name="message" id="message" className="rounded h-24 w-full" required value={formData.Pesan} onChange={(e) => setFormData({  ...formData ,Pesan: e.target.value })} placeholder="Masukkan pesan notifikasi"></textarea>
+                                        <textarea name="message" id="message" className="rounded h-24 w-full" required maxLength="255" value={formData.Pesan} onChange={(e) => {
+                                            const newText = e.target.value.slice(0, 255);
+                                            setFormData({  ...formData ,Pesan: newText });
+                                            setMsgLength(newText.length);
+                                            
+                                            }} placeholder="Masukkan pesan notifikasi"></textarea>
+                                        {
+                                            msgLength > 0 && (
+
+                                                <span>{msgLength}/255 karakter</span>
+                                            )
+                                        }
                                     </div>
                                     <button className="bg-blue-500 px-5 py-2 rounded-lg text-white font-semibold mt-4">Kirim</button>
                                 </form>
