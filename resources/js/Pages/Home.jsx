@@ -1,127 +1,118 @@
 import { Head, Link } from "@inertiajs/react";
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import Navbar from '@/Layouts/Navbar';
-import { faWifi ,faShower, faBed} from "@fortawesome/free-solid-svg-icons";
+import { faWifi, faShower, faBed } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Footer from "@/Layouts/Footer";
 
-
-export default function Home({ auth }) {
-
-   window.Echo.channel('messagechannel.').listen('MessageEvent',(e) => {
-       console.log(e);
-   })
+export default function Home({ auth, kosImage }) {
+    const scrollRef = useRef(null);
+    const footerRef = useRef(null);
+    console.log(kosImage);
+    window.Echo.channel('messagechannel.').listen('MessageEvent', (e) => {
+        console.log(e);
+    })
 
     return (
         <div className="overflow-y-auto h-full">
             <Head title="Home" />
-            <Navbar className={"bg-[#FFBF69] z-10"}>
-                <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+            <Navbar className={" z-10"}>
+                <Link className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Home
                 </Link>
-                <Link href={route('daftar')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                <Link href={route('daftar')} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Daftar
                 </Link>
-                <Link href={route('login')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
-                    Login
+                <Link href={route('login')} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                    Masuk
                 </Link>
-                <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                <Link onClick={(e) => {
+                    e.preventDefault();
+                    footerRef.current.scrollIntoView({ behavior: 'smooth'});
+                
+                    }} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Hubungi kami
                 </Link>
             </Navbar>
             <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
                 <div className="relative w-full overflow-hidden">
                     <div className="h-[600px]">
-                        <div className="h-full w-full carousel">
-                            <div className="w-full flex transition-transform duration-500 ease-in-out">
-                                <div className="w-full">
-                                    <img className="h-full w-full object-cover" src="https://via.placeholder.com/1920x600" alt="Kost 1" />
+                        <div className="h-full w-full">
+                            {/* <img className="h-full w-full object-cover" src={kosImage} alt="Kost 1" /> */}
+                            <section style={{ backgroundImage: `url(${kosImage})` }} className={`h-full w-full flex justify-center bg-cover bg-center bg-no-repeat bg-gray-600 bg-blend-multiply`}>
+                                <div className="text-center p-4">
+                                    <p className="lg:text-5xl sm:text-2xl mt-10 font-bold text-white">
+                                        Selamat datang di kost Bu Yati
+                                    </p>
+
+                                    <p className="lg:text-2xl sm:text-xl text-balance mt-10 text-gray-300">
+                                        Apakah Anda sedang mencari tempat yang nyaman dan aman untuk beristirahat? Kami menawarkan fasilitas terbaik untuk Anda. Datang dan rasakan beristirahat di kos yang selalu hadir untuk kebutuhan Anda. Mendaftar sekarang dan lihat apa yang kami tawarkan!
+                                    </p>
+                                    <div className="flex justify-center gap-5 mt-10">
+                                        <Link href={route('daftar')} className="bg-blue-500 hover:bg-blue-600 rounded-lg py-3 px-5 text-white font-sans font-extrabold max-md:p-2">
+                                            Daftar
+                                        </Link>
+                                        <button onClick={() => scrollRef.current.scrollIntoView({ behavior: 'smooth'})} className="ring-1 ring-white hover:bg-white hover:text-black rounded-lg py-3 px-5 text-white font-sans font-extrabold max-md:p-2">
+                                            Pelajari lebih lanjut
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="w-full">
-                                    <img className="h-full w-full object-cover" src="https://via.placeholder.com/1920x600" alt="Kost 2" />
-                                </div>
-                                <div className="w-full">
-                                    <img className="h-full w-full object-cover" src="https://via.placeholder.com/1920x600" alt="Kost 3" />
-                                </div>
-                            </div>
+                            </section>
                         </div>
-                    </div>
-                    <div className="absolute bottom-0 left-1/2 w-16 h-16 rounded-full bg-white text-gray-500 shadow-lg hover:bg-gray-500 hover:text-white" onClick={() => {
-                        let carousel = document.querySelector('.carousel');
-                        let children = carousel.children[0].children;
-                        let index = Array.from(children).indexOf(children.find(elem => elem.classList.contains('translate-x-0')))
-                        index = (index + 1) % children.length;
-                        children[index].classList.add('translate-x-0');
-                        children[index].classList.remove('-translate-x-full');
-                        children[(index - 1 + children.length) % children.length].classList.add('-translate-x-full');
-                        children[(index - 1 + children.length) % children.length].classList.remove('translate-x-0');
-                    }}>
-                        <FontAwesomeIcon className="text-2xl" icon={faShower}/>
-                    </div>
-                    <div className="absolute bottom-0 right-1/2 w-16 h-16 rounded-full bg-white text-gray-500 shadow-lg hover:bg-gray-500 hover:text-white" onClick={() => {
-                        let carousel = document.querySelector('.carousel');
-                        let children = carousel.children[0].children;
-                        let index = Array.from(children).indexOf(children.find(elem => elem.classList.contains('translate-x-0')))
-                        index = (index - 1 + children.length) % children.length;
-                        children[index].classList.add('translate-x-0');
-                        children[index].classList.remove('-translate-x-full');
-                        children[(index + 1) % children.length].classList.add('-translate-x-full');
-                        children[(index + 1) % children.length].classList.remove('translate-x-0');
-                    }}>
-                        <FontAwesomeIcon className="text-2xl" icon={faBed}/>
-                    </div>
-                    <div className="absolute bottom-0 left-1/2 w-full h-2 bg-gray-500" style={{ transform: 'translateX(calc(50% - 12px))' }}>
-                        <div className="h-full bg-white w-2 transition-transform duration-300 ease-in-out" style={{ transform: 'translateX(calc(50% - 12px))' }}></div>
                     </div>
                 </div>
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div>
-                        <div className="text-xl font-medium text-center pt-5">
-                            Selamat datang di kost Bu Yati
+                    <div className="mt-10">
+                        <div ref={scrollRef} className="text-center text-gray-600 lg:text-4xl sm:text-xl font-bold mb-10">
+                            Fasilitas
                         </div>
-                        <div className="mt-5 flex justify-center items-center gap-10 flex-col lg:flex-row xl:flex-row ">
-                            <div className="w-[256px] h-[256px] drop-shadow bg-white p-5 rounded">
-                                <div className="flex flex-row w-[64px] h-[64px] items-center justify-center bg-blue-100 rounded">
-                                    <FontAwesomeIcon className="text-4xl text-blue-500" icon={faWifi}/>
-                                </div>
-                                <div>
-                                    <div className="pt-2 text-xl font-extrabold">
-                                        Free wifi
-                                    </div>
-                                    <p className="pt-2">
-                                        Nikmati wifi berkecepatan 10 Mbps tanpa batas kapan saja 😱.
-                                    </p>
-                                </div>
+                        <div className="flex items-center justify-evenly">
+                            <div className="flex flex-row w-[64px] h-[64px] m-10 p-10 lg:m-0 lg:p-0 lg:w-[128px] lg:h-[128px] sm:w-[64px] sm:h-[64px] shadow-md items-center justify-center bg-blue-100 rounded-full">
+                                <FontAwesomeIcon className="text-3xl lg:text-6xl sm:text-xl text-blue-500" icon={faWifi} />
                             </div>
-                            <div className="w-[256px] h-[256px] drop-shadow bg-white p-5 rounded">
-                                <div className="flex flex-row w-[64px] h-[64px] items-center justify-center bg-blue-100 rounded">
-                                    <FontAwesomeIcon className="text-4xl text-blue-500" icon={faShower}/>
-                                </div>
-                                <div>
-                                    <div className="pt-2 text-xl font-extrabold">
-                                        Kamar mandi dalam
-                                    </div>
-                                    <p className="pt-2">
-                                        Dijamin kenyamanan dan ketentraman. Tidak perlu mengantri 😁.
-                                    </p>
-                                </div>
+                            <div>
+                                <p className="text-balance lg:text-xl font-bold text-gray-600">
+                                    Nikmati wifi nyaman, stabil, dan cepat seperti berada di rumah sendiri, tanpa batasan kapan saja.
+                                </p>
+                                <p className="text-balance lg:text-md text-gray-600 ">
+                                    Dengan kecepatan 35 Mbps tanpa batas.
+                                </p>
                             </div>
-                            <div className="w-[256px] h-[256px] drop-shadow bg-white p-5 rounded">
-                                <div className="flex flex-row w-[64px] h-[64px] items-center justify-center bg-blue-100 rounded">
-                                    <FontAwesomeIcon className="text-4xl text-blue-500" icon={faBed}/>
-                                </div>
-                                <div>
-                                    <div className="pt-2 text-xl font-extrabold">
-                                        Fasilitas lengkap
-                                    </div>
-                                    <p className="pt-2">
-                                        Ada kasur, lemari, kipas dan cermin untuk melihat dirimu yang cakep 🗿.
-                                    </p>
-                                </div>
+                        </div>
+                        <div className="flex items-center justify-evenly mt-32">
+                            <div className="max-sm:ps-10">
+                                <p className="text-balance lg:text-xl font-bold text-gray-600">
+                                    Nikmati kenyamanan dengan kamar mandi dalam per kamar.
+                                </p>
+                                <p className="text-balance lg:text-md text-gray-600">
+                                    Setiap kamar kami dilengkapi dengan kamar mandi dalam yang nyaman dan praktis.
+                                </p>
+                            </div>
+                            <div className="flex flex-row w-[64px] h-[64px] m-10 p-10 lg:m-0 lg:p-0 lg:w-[128px] lg:h-[128px] sm:w-[64px] sm:h-[64px] shadow-md items-center justify-center bg-blue-100 rounded-full">
+                                <FontAwesomeIcon className="text-3xl lg:text-6xl sm:text-xl text-blue-500" icon={faShower} />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-evenly mt-32">
+                            <div className="flex flex-row w-[64px] h-[64px] m-10 p-10 lg:m-0 lg:p-0 lg:w-[128px] lg:h-[128px] sm:w-[64px] sm:h-[64px] shadow-md items-center justify-center bg-blue-100 rounded-full">
+                                <FontAwesomeIcon className="text-3xl lg:text-6xl sm:text-xl text-blue-500" icon={faBed} />
+                            </div>
+                            <div>
+                                <p className="text-balance lg:text-xl font-bold text-gray-600">
+                                    Nikmati kemudahan beristirahat dengan fasilitas lengkap kos.
+                                </p>
+                                <p className="text-balance lg:text-md text-gray-600 ">
+                                    Setiap kamar kami dilengkapi dengan kasur yang nyaman, lemari untuk menyimpan barang pribadi, dan lain-lain.
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div ref={footerRef}>
+
+                <Footer/>
             </div>
         </div>
     )
