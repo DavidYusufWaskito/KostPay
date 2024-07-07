@@ -22,7 +22,7 @@ export default function AdminHeader({ children, auth }) {
     return (
         <>
             <Head title="Home" />
-            <Navbar className={"bg-[#69a8ff] z-10"}>
+            <Navbar className={"z-10"} Admin={true}>
                 <Link href={route('admin.dashboard')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Dashboard
                 </Link>
