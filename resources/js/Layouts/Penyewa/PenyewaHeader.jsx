@@ -131,6 +131,12 @@ export default function PenyewaHeader({ children , auth}) {
 
                 {window.innerWidth < 768 && notificationsOpen && (
                     <div className="fixed top-[8rem] left-0 w-full h-[calc(80%-4rem)] md:hidden bg-white overflow-y-auto">
+                        <div className='flex justify-between items-center mt-5'>
+                            <span className='text-lg ms-2 text-gray-600 font-bold'>Notifikasi</span>
+                            <button onClick={()=>changeAllNotifStatus(auth.user.id)} className='text-gray-600 border border-gray-600 rounded-full px-2 py-2 me-2 transition-colors duration-300'>
+                                Tandai semua sebagai terbaca
+                            </button>
+                        </div>
                         <div className="flex flex-col h-full gap-2 mt-2 mb-2 px-2 overflow-auto" role="none">
                             {notificationData.data.length > 0 ? (
                                 notificationData.data.map((notif) => (
@@ -144,11 +150,6 @@ export default function PenyewaHeader({ children , auth}) {
                             ) : (
                                 <p className="text-center text-gray-500 text-sm">Tidak ada notifikasi</p>
                             )}
-                        </div>
-                        <div className='flex justify-center'>
-                            <button onClick={()=>changeAllNotifStatus(auth.user.id)} className='text-gray-700 hover:text-blue-500 transition-colors duration-300'>
-                                Tandai semua sebagai terbaca
-                            </button>
                         </div>
                     </div>
                 )}
