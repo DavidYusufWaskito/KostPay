@@ -21,12 +21,21 @@ export default function Home({ auth, kosImage }) {
                 <Link className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Home
                 </Link>
-                <Link href={route('daftar')} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
-                    Daftar
-                </Link>
-                <Link href={route('login')} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
-                    Masuk
-                </Link>
+                
+                {auth?.user ?
+                    <Link href={route('admin.dashboard')} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                        Dashboard
+                    </Link>
+                    :
+                    <>
+                        <Link href={route('daftar')} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                            Daftar
+                        </Link>
+                        <Link href={route('login')} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                            Masuk
+                        </Link>
+                    </>
+                }
                 <Link onClick={(e) => {
                     e.preventDefault();
                     footerRef.current.scrollIntoView({ behavior: 'smooth'});

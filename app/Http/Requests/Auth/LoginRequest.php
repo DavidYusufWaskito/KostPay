@@ -29,6 +29,23 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            
+        ];
+    }
+
+        /**
+     * Get the validation messages that apply to the request.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email harus diisi.',
+            'email.string' => 'Email harus berupa string.',
+            'email.email' => 'Email harus merupakan alamat email yang valid.',
+            'password.required' => 'Password harus diisi.',
+            'password.string' => 'Password harus berupa string.',
         ];
     }
 
