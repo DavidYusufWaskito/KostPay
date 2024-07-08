@@ -23,15 +23,6 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
-    
-    return Inertia::render('Home', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
 
 Route::get('/msg',function()
 {
@@ -56,9 +47,9 @@ Route::middleware('auth:web')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/',[HomeController::class,'index'])->name('home');
 Route::middleware('guest')->group(function ()
 {
-    Route::get('/home',[HomeController::class,'index'])->name('home');
     Route::get('/daftar',[HomeController::class,'v_daftar'])->name('daftar');
 });
 

@@ -22,30 +22,30 @@ export default function AdminHeader({ children, auth }) {
     return (
         <>
             <Head title="Home" />
-            <Navbar className={"bg-[#69a8ff] z-10"}>
-                <Link href={route('admin.dashboard')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+            <Navbar className={"z-10"} Admin={true}>
+                <Link href={route('admin.dashboard')} className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Dashboard
                 </Link>
-                <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                <Link className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Manage kamar
                 </Link>
-                <Link href={route('admin.manage.penyewa')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                <Link href={route('admin.manage.penyewa')} className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Manage penyewa
                 </Link>
-                <Link href={route('admin.notifikasi')} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                <Link href={route('admin.notifikasi')} className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Kirim notifikasi
                 </Link>
-                <button onClick={toggleProfileDropdown} className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 max-md:hidden" id="menu-button" aria-expanded={profileDropdownOpen} aria-haspopup="true">
+                <button onClick={toggleProfileDropdown} className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 max-md:hidden" id="menu-button" aria-expanded={profileDropdownOpen} aria-haspopup="true">
                     Profil
                 </button>
                 <div className="max-md:border-t-[1px]">
                     <div className="max-md:text-slate-500/50 max-md:pt-1 max-md:ps-2 text-sm hidden max-md:block">
                         Profile
                     </div>
-                    <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 hidden max-md:block ">
+                    <Link className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 hidden max-md:block ">
                         Account settings
                     </Link>
-                    <Link className="text-[#FFFF] hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 hidden max-md:block " method="post" href={route('admin.logout')}>
+                    <Link className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 hidden max-md:block " method="post" href={route('admin.logout')}>
                         Sign out
                     </Link>
                 </div>

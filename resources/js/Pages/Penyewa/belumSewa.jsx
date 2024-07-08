@@ -12,7 +12,7 @@ export default function PenyewaDashboard({ auth }) {
                     <div className="bg-white rounded shadow p-4">
                         <div className="flex items-center justify-between mb-4">
                             <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                            <p className="text-sm text-gray-600">Selamat datang {' ' + auth.user.nama}</p>
+                            <p className="ps-5 sm:ps-0 text-sm text-gray-600">Selamat datang {' ' + auth.user.nama}</p>
                         </div>
                         <div className="flex items-center justify-center">
                             <div className="bg-white p-4">

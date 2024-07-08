@@ -38,6 +38,16 @@ class RegisteredUserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|lowercase|email|max:255|unique:'.Penyewa::class,
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            ], [
+                'name.required' => 'Nama harus diisi',
+                'name.string' => 'Nama harus berupa string',
+                'email.required' => 'Email harus diisi',
+                'email.string' => 'Email harus berupa string',
+                'email.email' => 'Email harus merupakan alamat email yang valid',
+                'email.unique' => 'Email ini sudah terdaftar',
+                'password.string' => 'Password harus berupa string',
+                'password.confirmed' => 'Konfirmasi password tidak cocok',
+                'password.required' => 'Password harus diisi',
             ]);
         } catch (ValidationException $e) {
             // Log validation errors for debugging
