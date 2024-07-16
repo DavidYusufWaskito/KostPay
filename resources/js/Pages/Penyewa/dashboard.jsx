@@ -54,70 +54,67 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
 
     useMidtrans(MIDTRANS_CLIENT_KEY);
       
-    const getSnapToken = async () => {
-        const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        const requestConfig = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': token
-            },
-            body: JSON.stringify({
-                TotalBayar: paymentData.TotalBayar,
-                idDetailKamar: paymentData.idDetailKamar
-            })
-        }
+const getSnapToken = async () => {
 
-        console.log('Requesting snap token');
-        console.log(paymentData);
-        const response = await fetch('/penyewa/bayar', requestConfig);
-        console.log(response);
-        const responseJSON = await response.json();
-        console.log(responseJSON);
-        if (response.ok) {
-            window.snap.pay(responseJSON.snapToken,{
-                onSuccess: function(result){
-                    /* You may add your own implementation here */
-                    alert("Pembayaran berhasil!"); console.log(result);
-                },
-                onPending: function(result){
-                    /* You may add your own implementation here */
-                    alert("Menunggu pembayaran!"); console.log(result);
-                },
-                onError: function(result){
-                    /* You may add your own implementation here */
-                    alert("Pembayaran gagal!"); console.log(result);
-                },
-                onClose: function(){
-                    /* You may add your own implementation here */
-                    alert('Kamu belum bayar loh!, silahkan klik kolom riwayat transaksi yang berstatus belum bayar untuk membayar tagihanmu!');
-                }
-            });
-        }
-        else{
-            alert(responseJSON.error);
-        }
-    }
+    console.log('Requesting snap token');
+    console.log(paymentData);
 
-    const getTransactions = async () => {
-        const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        const requestConfig = {
-          method: 'POST',
-          headers: {
+    axios.post('/penyewa/bayar', {
+        TotalBayar: paymentData.TotalBayar,
+        idDetailKamar: paymentData.idDetailKamar
+    }, {
+        headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token
-          },
-          body: JSON.stringify({
-            id: auth.user.id
-          })
+            // 'X-CSRF-TOKEN': token
         }
-        const response = await fetch('/penyewa/transactions', requestConfig);
-        const responseJSON = await response.json();
+    })
+    .then((response) => {
+        console.log(response);
+            window.snap.pay(response.data.snapToken,{
+            onSuccess: function(result){
+                /* You may add your own implementation here */
+                alert("Pembayaran berhasil!"); console.log(result);
+            },
+            onPending: function(result){
+                /* You may add your own implementation here */
+                alert("Menunggu pembayaran!"); console.log(result);
+            },
+            onError: function(result){
+                /* You may add your own implementation here */
+                alert("Pembayaran gagal!"); console.log(result);
+            },
+            onClose: function(){
+                /* You may add your own implementation here */
+                alert('Kamu belum bayar loh!, silahkan klik kolom riwayat transaksi yang berstatus belum bayar untuk membayar tagihanmu!');
+            }
+        });
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
+    const getTransactions = () => {
+      axios.post('/penyewa/transactions', {
+        id: auth.user.id
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        //   'X-CSRF-TOKEN': readCookie('XSRF-TOKEN')
+        }
+      })
+      .then(response => {
+        const responseJSON = response.data;
         console.log(responseJSON);
         setTransactionData((e) => {return responseJSON});
         setTablePending(false);
         console.log(TransactionData)
-      }
+      })
+      .catch(error => {
+        console.log(error);
+        alert(error.response.data.error);
+      })
+    }
 
     
       const handleBayarClick = () => {
@@ -141,7 +138,7 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
                     <div className="bg-white rounded shadow p-4">
                         <div className="flex items-center justify-between mb-4">
                             <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                            <p className="text-sm text-gray-600">Selamat datang {' ' + auth.user.nama}</p>
+                            <p className="ps-5 sm:ps-0 text-sm text-gray-600">Selamat datang {' ' + auth.user.nama}</p>
                         </div>
                     </div>
                     

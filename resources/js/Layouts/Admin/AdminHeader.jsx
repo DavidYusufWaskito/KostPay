@@ -26,7 +26,7 @@ export default function AdminHeader({ children, auth }) {
                 <Link href={route('admin.dashboard')} className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Dashboard
                 </Link>
-                <Link className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                <Link href={route('admin.manage.kamar')} className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Manage kamar
                 </Link>
                 <Link href={route('admin.manage.penyewa')} className="text-gray-500 hover:text-[#EB5160] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">

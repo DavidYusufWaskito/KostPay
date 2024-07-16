@@ -25,6 +25,11 @@ class AdminController extends Controller
         return Inertia::render('Admin/Penyewa/managePenyewa',['DetailKamar' => $DetailKamar]);
     }
 
+    public function v_ManageKamar(Request $request)
+    {
+        return Inertia::render('Admin/Kamar/manageKamar');
+    }
+
     public function v_ManageTransaksi(Request $request)
     {
         return Inertia::render('Admin/Transaksi/manageTransaksi');

@@ -59,61 +59,56 @@ export default function PenyewaHeader({ children , auth}) {
 
 
     const fetchNotif = async () => {
-        const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        const requestConfig = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token
-          },
-          body: JSON.stringify({
+        axios.post('/notifikasi', {
             idPenyewa: auth.user.id
-          })
-        }
-        const response = await fetch('/notifikasi', requestConfig);
-        const responseJSON = await response.json();
-        console.log(responseJSON);
-        if (response.ok)
-        {
-            setNotificationData(responseJSON);
-            console.log("Notification: ", notificationData);
-        }
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+            if (response.status === 200)
+            {
+                setNotificationData(response.data);
+                console.log("Notification: ", notificationData);
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        });
     }
 
     const changeNotifStatus = async (idNotif) => {
-        const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        const requestConfig = {
-          method: 'POST',
-          headers: {
+        axios.post('/notifikasi/change/status', {idNotif: idNotif}, 
+        {headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token
-          },
-          body: JSON.stringify({
-            idNotif: idNotif
-          })
-        }
-        const response = await fetch('/notifikasi/change/status', requestConfig);
-        const responseJSON = await response.json();
-        console.log(responseJSON);
-        fetchNotif();
+        }})
+        .then(response => {
+            console.log(response.data);
+            fetchNotif();
+        })
+        .catch(error => {
+            console.log(error);
+        });
     }
 
     const changeAllNotifStatus = async (idPenyewa) => {
-        const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        const requestConfig = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token
-          },
-          body: JSON.stringify({
+        axios.post('/notifikasi/change/status/all', {
             idPenyewa: idPenyewa
-          })
-        }
-        const response = await fetch('/notifikasi/change/status/all', requestConfig);
-        const responseJSON = await response.json();
-        console.log(responseJSON);
-        fetchNotif();
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+            fetchNotif();
+        })
+        .catch(error => {
+            console.log(error);
+        });
     }
 
     return (

@@ -15,7 +15,7 @@ class PenyewaDashboardController extends Controller
         
         $DetailKamar = DetailKamar::where('idPenyewa', $Penyewa->id)->first();
 
-        if (!$DetailKamar) {
+        if (!$DetailKamar || $DetailKamar->StatusAktif == 0) {
             return Inertia::render('Penyewa/belumSewa');
         }
 

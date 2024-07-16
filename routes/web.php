@@ -8,6 +8,9 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PenyewaController;
 use App\Http\Controllers\PenyewaDashboardController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\KamarController;
+use App\Models\DetailKamar;
+use App\Http\Controllers\DetailKamarController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -71,9 +74,20 @@ Route::group(['middleware' => ['auth:admin']],function(){
     Route::post('/admin/manage/penyewa/update',[PenyewaController::class,'updatePenyewa'])->name('admin.manage.penyewa.update');
     Route::post('/admin/manage/penyewa/delete',[PenyewaController::class,'onDestroy'])->name('admin.manage.penyewa.destroy');
 
+    Route::post('/admin/get/all/detailKamar',[DetailKamarController::class,'getAllDetailKamar'])->name('admin.get.all.detailKamar');
+    Route::post('/admin/add/detailKamar',[PenyewaController::class,'createDetailKamar'])->name('admin.add.detailKamar');
+    Route::post('/admin/update/detailKamar',[DetailKamarController::class,'onEdit'])->name('admin.update.detailKamar');
+
     Route::get('/admin/manage/transaksi',[AdminController::class,'v_ManageTransaksi'])->name('admin.manage.transaksi');
     Route::post('/admin/get/all/transaksi',[TransactionController::class,'getAllTransaction'])->name('admin.get.all.transaction');
     Route::post('/admin/sync/all/transaksi',[TransactionController::class,'syncAllTransaction'])->name('admin.sync.all.transaction');
+
+
+    Route::get('/admin/manage/kamar',[AdminController::class,'v_ManageKamar'])->name('admin.manage.kamar');
+    Route::get('/admin/get/all/kamar',[KamarController::class,'getAllKamar'])->name('admin.get.kamar');
+
+    Route::post('/admin/manage/kamar/store',[KamarController::class,'storeKamar'])->name('admin.manage.kamar.store');
+    Route::post('/admin/manage/kamar/delete',[KamarController::class,'onDestroy'])->name('admin.manage.kamar.delete');
 });
 
 

@@ -1,28 +1,38 @@
 import { Head, Link,useForm } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import Modal from "@/Components/Modal";
-import {faEdit,faTrash,faTimes} from "@fortawesome/free-solid-svg-icons";
+import {faEdit,faTrash,faTimes,faCheckSquare,faSquare} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DataTable from "react-data-table-component";
 import CustomPaginationComponent from "@/Components/DatatableComponent/CustomPagination";
 import TextInput from "@/Components/TextInput";
 import AdminHeader from "@/Layouts/Admin/AdminHeader";
+import axios from "axios";
 
-export default function ManagePenyewa({ auth, DetailKamar}) {
+export default function ManagePenyewa({ auth}) {
     const [penyewaData, setPenyewaData] = useState([]);
+    const [DetailKamar,setDetailKamar] = useState([]);
+    const [kamarData,setKamarData] = useState([]);
 
-    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [EditModal, setEditModal] = useState({show:false,rowData:null});
     const [DeleteModal, setDeleteModal] = useState({show:false,rowID:1});
-    
 
+    const [DetailSewaModal, setDetailSewaModal] = useState({show:false,editMode:false,rowData:null});
+    const [DetailSewaFormData, setDetailSewaFormData] = useState({
+        id:0,
+        idPenyewa:0,
+        idKamar:0,
+        TanggalSewa:'',
+        TanggalJatuhTempo:'',
+        StatusAktif:0
+    });
 
     const [searchQuery, setSearchQuery] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [currentPage, setCurrentPage] = useState(1);
 
-
+    // Formdatas
     const {data,setData,post,processing,errors,reset} = useForm({
         nama:'',
         email:'',
@@ -36,21 +46,10 @@ export default function ManagePenyewa({ auth, DetailKamar}) {
     useEffect(() => {
         reset();
         fetchPenyewa();
+        fetchDetailKamar();
+        fetchKamar();
     }, [])
     
-
-    // Check window width and set profile dropdown to false
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 768) {
-                setProfileDropdownOpen(false);
-            }
-        };
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
 
     // Update rowData when EditModal is Open
     useEffect(() => {
@@ -98,6 +97,34 @@ export default function ManagePenyewa({ auth, DetailKamar}) {
         console.log(currentPage);
         setCurrentPage(newPage);
     };
+
+    const fetchDetailKamar = async () => {
+        const token = document.head.querySelector('meta[name="csrf-token"]').content;
+        const response = await axios.post('/admin/get/all/detailKamar', {
+            headers: {
+                'X-CSRF-TOKEN': token
+            }
+        }).then((response) => {
+            console.log(response.data);
+            setDetailKamar(response.data);
+        }).catch((error) => {
+            console.log(error.response.data);
+        });
+    }
+
+    const fetchKamar = async () => {
+        const token = document.head.querySelector('meta[name="csrf-token"]').content;
+        const response = await axios.get('/admin/get/all/kamar', {
+            headers: {
+                'X-CSRF-TOKEN': token
+            }
+        }).then((response) => {
+            console.log(response.data);
+            setKamarData(response.data);
+        }).catch((error) => {
+            console.log(error.response.data);
+        });
+    }
 
     const fetchPenyewa = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
@@ -224,6 +251,72 @@ export default function ManagePenyewa({ auth, DetailKamar}) {
         }
     }
 
+    const createDetailSewa = async (id) => {
+        const token = document.head.querySelector('meta[name="csrf-token"]').content;
+        const response = axios.post('/admin/add/detailKamar', {
+            id: id
+        }, {
+            headers: {
+                'X-CSRF-TOKEN': token
+            }
+        })
+        .then((response) => {
+            console.log(response.data);
+            fetchDetailKamar();
+            fetchPenyewa();
+        })
+        .catch((error) => {
+            console.log(error.response.data);
+        })
+    }
+
+    const openDetailSewaModal = (rowData) => {
+        setDetailSewaModal({ show: true, rowData: rowData});
+        console.log(rowData);
+        let filteredDetailSewa = DetailKamar.filter((item) => {
+            return (
+                item.idPenyewa === rowData.id
+            );
+        });
+
+        setDetailSewaFormData({
+            id: filteredDetailSewa[0].id,
+            idPenyewa: filteredDetailSewa[0].idPenyewa,
+            idKamar: filteredDetailSewa[0].idKamar,
+            StatusAktif: filteredDetailSewa[0].StatusAktif,
+            TanggalSewa: filteredDetailSewa[0].TanggalSewa,
+            TanggalJatuhTempo: filteredDetailSewa[0].TanggalJatuhTempo
+
+        });
+
+        console.log(DetailSewaFormData);
+    }
+
+    const onEditDetailSewa = async () => {
+        const token = document.head.querySelector('meta[name="csrf-token"]').content;
+        axios.post('/admin/update/detailKamar', {
+            id: DetailSewaFormData.id,
+            idPenyewa: DetailSewaFormData.idPenyewa,
+            idKamar: DetailSewaFormData.idKamar,
+            StatusAktif: DetailSewaFormData.StatusAktif,
+            TanggalSewa: DetailSewaFormData.TanggalSewa,
+            TanggalJatuhTempo: DetailSewaFormData.TanggalJatuhTempo
+        }, {
+            headers: {
+                'X-CSRF-TOKEN': token
+            }
+        })
+        .then((response) => {
+            setDetailSewaModal((prevState) => ({ ...prevState, editMode: false }));
+            fetchKamar();
+            fetchPenyewa();
+            fetchDetailKamar();
+        })
+        .catch((error) => {
+            alert('Terjadi kesalahan: ' + error.response?.data?.message || error.message);
+        });
+    }
+
     return (
         <div className="overflow-y-auto h-full">
             <AdminHeader auth={auth} />
@@ -272,11 +365,17 @@ export default function ManagePenyewa({ auth, DetailKamar}) {
                                     sortable:true,
                                 },
                                 {
-                                    name: 'Id kamar',
-                                    selector: (row) => {
-                                        const detailKamar = DetailKamar.find(detail => detail.idPenyewa === row.id);
-                                        return detailKamar ? detailKamar.idKamar : "Belum menyewa kamar";
-                                    },
+                                    name: 'Status penyewaan',
+                                    cell: (row) => (
+                                        // const detailKamar = DetailKamar.find(detail => detail.idPenyewa === row.id);
+                                        // return detailKamar ? detailKamar.idKamar : "Belum menyewa kamar";
+                                        <div className="flex justify-center gap-5">
+                                            <button onClick={(e)=>{
+                                                e.preventDefault();
+                                                openDetailSewaModal(row);
+                                                }} className={"px-5 py-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white"}>Lihat detail sewa</button>
+                                        </div>
+                                    ),
                                 },
                                 {
                                     name: 'Aksi',
@@ -408,6 +507,129 @@ export default function ManagePenyewa({ auth, DetailKamar}) {
                             <div className="flex justify-end mt-4 gap-5">
                                 <button onClick={() => onDelete()} className="text-red rounded-lg hover:before:bg-redborder-red-500 relative h-[50px] w-40 overflow-hidden border border-red-500 bg-white px-3 text-red-500 shadow-2xl transition-all before:absolute before:bottom-0 before:left-0 before:top-0 before:z-0 before:h-full before:w-0 before:bg-red-500 before:transition-all before:duration-500 hover:text-white hover:shadow-red-500 hover:before:left-0 hover:before:w-full"><span className="relative z-10">Ya</span></button>
                                 <button onClick={() => setDeleteModal({show:false,rowID:1})} className="border border-blue-500 text-blue-500 px-5 py-2 rounded-md mr-2 transition-all duration-300 hover:bg-blue-500 hover:text-white">Tidak</button>
+                            </div>
+                        </div>
+                    </Modal>
+
+                    {/* Modal Detail Sewa */}
+                    <Modal show={DetailSewaModal.show} onClose={() => {
+                        setDetailSewaModal({show:false,rowData:null});
+                        setDetailSewaFormData({
+                            id:0,
+                            idPenyewa:0,
+                            idKamar:0,
+                            TanggalSewa:'',
+                            TanggalJatuhTempo:'',
+                            StatusAktif:0
+                        });
+                        }}>
+                        <div className="bg-white rounded-lg shadow-lg p-4">
+                            <h1 className="text-2xl font-semibold text-gray-600 text-center pb-5 border-b-[1px]">
+                                Detail Sewa
+                            </h1>
+                            <div className="flex justify-end mt-4">
+                                {
+                                    DetailSewaModal.show && DetailKamar.filter(detail => detail.idPenyewa === DetailSewaModal.rowData.id).length > 0 ? (
+                                        <button className={"bg-blue-100 text-blue-500 font-bold py-2 px-4 rounded-full"} onClick={() => setDetailSewaModal({...DetailSewaModal,editMode: !DetailSewaModal.editMode})}>
+                                            <span className="pr-2">Edit</span>
+                                            <FontAwesomeIcon className={"text-xl " + (DetailSewaModal.editMode ? "text-green-500" : "text-blue-500")} icon={
+                                                DetailSewaModal.editMode ? faCheckSquare : faSquare
+                                            }/>
+                                        </button>
+                                    ) : null
+                                }
+                            </div>
+                            <div className="mt-4">
+                                {DetailSewaModal.show && DetailKamar.filter(detail => detail.idPenyewa === DetailSewaModal.rowData.id).length > 0 ? (
+                                    DetailKamar.filter(detail => detail.idPenyewa === DetailSewaModal.rowData.id).map(detail => (
+                                        <div key={detail.id} className="block">
+                                            <div className="flex flex-col w-[100%] items-start justify-between gap-5 mt-4">
+                                                <div className="flex w-full justify-between">
+                                                    <span>Tanggal Sewa:</span>
+                                                    <div>
+                                                        {
+                                                            DetailSewaModal.editMode ? (
+                                                                <input className="rounded-lg " value={DetailSewaFormData.TanggalSewa} onChange={(e) => {
+                                                                    setDetailSewaFormData({...DetailSewaFormData,TanggalSewa:e.target.value});
+                                                                }} type="date"/>
+                                                            ) : (
+                                                                detail.TanggalSewa
+                                                            )
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div className="flex w-full justify-between">
+                                                    <span>Tanggal Jatuh tempo:</span>
+                                                    <div>
+                                                        {
+                                                            DetailSewaModal.editMode ? (
+                                                                <input className="rounded-lg " value={DetailSewaFormData.TanggalJatuhTempo} onChange={(e) => setDetailSewaFormData({...DetailSewaFormData,TanggalJatuhTempo:e.target.value})} type="date"/>
+                                                            ) : (
+                                                                detail.TanggalJatuhTempo
+                                                            )
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div className="flex w-full justify-between">
+                                                    <span>Id kamar:</span>
+                                                    <div>
+                                                        {
+                                                            DetailSewaModal.editMode ? (
+                                                                <select value={DetailSewaFormData.idKamar} className="rounded-lg" onChange={(e) => setDetailSewaFormData({...DetailSewaFormData,idKamar:e.target.value})}>
+                                                                    <option key={detail.id} value={detail.idKamar}>{detail.idKamar}</option>
+                                                                    {
+                                                                        kamarData.filter(kamar => kamar.StatusKamar === 0).map(kamar => (
+                                                                            <option key={kamar.id} value={kamar.id}>{kamar.id}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
+                                                            ) : (
+                                                                detail.idKamar
+                                                            )
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div className="flex w-full justify-between">
+                                                    <span>Status Aktif:</span>
+                                                    <div>
+                                                        {
+                                                            DetailSewaModal.editMode ? (
+                                                                <select value={DetailSewaFormData.StatusAktif} onChange={(e) => setDetailSewaFormData({...DetailSewaFormData,StatusAktif:e.target.value})} className="rounded-lg" >
+                                                                    <option value="1">Aktif</option>
+                                                                    <option value="0">Tidak Aktif</option>
+                                                                </select>
+                                                            ) : (
+                                                                detail.StatusAktif ? "Aktif" : "Tidak Aktif"
+                                                            )
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-end gap-5 mt-4">
+                                                {
+                                                    DetailSewaModal.editMode ? (
+                                                        <>
+                                                            <button onClick={onEditDetailSewa} className="bg-blue-500 text-white px-4 py-2 w-[30%] rounded-md">Simpan</button>
+                                                            <button onClick={() => setDetailSewaModal({show:false,rowData:null})} className="bg-red-500 text-white px-4 py-2 w-[30%] rounded-md">Batal</button>
+                                                        </>
+                                                    ) : (
+                                                        <button onClick={() => setDetailSewaModal({show:false,rowData:null})} className="bg-red-500 text-white px-4 py-2 w-[30%] rounded-md">Kembali</button>
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="flex flex-col w-[100%] items-center justify-between gap-5 mt-4">
+
+                                        <div className="text-center">Belum Menyewa Kamar</div>
+                                        <button onClick={(e) => {
+                                            e.preventDefault();
+                                            createDetailSewa(DetailSewaModal.rowData.id);
+                                            }} className="bg-blue-500 text-white px-4 py-2 w-[30%] rounded-md">Tambah detail sewa</button>
+                                    </div>
+                                    
+                                )}
                             </div>
                         </div>
                     </Modal>

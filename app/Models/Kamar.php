@@ -16,4 +16,10 @@ class Kamar extends Model
         'HargaSewa',
         'StatusKamar'
     ];
+
+    # Attribute member
+    protected $attributes = [
+        'StatusKamar' => 0
+
+    ];
 }
