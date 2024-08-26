@@ -25,6 +25,10 @@ class TransactionController extends Controller
                 return response()->json(['error' => 'Selesaikan transaksi terlebih dahulu (Id transaksi: ' . $transaction->id . ', total: Rp. ' . $transaction->TotalBayar . ')'], 400);
             }
 
+            if ($request->TotalBayar < config('helper.minimal_pembayaran') && !(auth()->user()->Tunggakan < config('helper.minimal_pembayaran'))){
+                return response()->json(['error' => 'Total Bayar minimal Rp. ' . config('helper.minimal_pembayaran')], 400);
+            }
+
             if ($request->TotalBayar > auth()->user()->tunggakan) {
                 return response()->json(['error' => 'Total Bayar melebihi tunggakan'], 400);
             } elseif ($request->TotalBayar == 0) {

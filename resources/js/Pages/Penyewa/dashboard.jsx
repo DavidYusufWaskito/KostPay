@@ -8,8 +8,9 @@ import NumberInput from "@/Components/NumberInput";
 import StatusPembayaran from "@/Components/DatatableComponent/StatusPembayaran";
 import CustomLoading from "@/Components/DatatableComponent/CustomLoading";
 import { useMidtrans } from "@/Components/useMidtrans";
+import { Snackbar,SnackbarContent } from "@mui/material";
 
-export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIENT_KEY}) {
+export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIENT_KEY,minimal_pembayaran}) {
     const [TransactionData, setTransactionData] = useState([]);
     const [showBayarModal, setShowBayarModal] = useState(false);
 
@@ -17,12 +18,16 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [currentPage, setCurrentPage] = useState(1);
     const [TablePending,setTablePending] = useState(true);
-
+    const [openSnackbar, setOpenSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'success'
+    });
 
     const [paymentData,setPaymentData] = useState({
         TotalBayar: 0,
         idDetailKamar:DetailKamar.id
-    })
+    });
 
     const handleSearch = (event) => {
         setSearchQuery(event.target.value);
@@ -53,46 +58,64 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
     },[])
 
     useMidtrans(MIDTRANS_CLIENT_KEY);
-      
-const getSnapToken = async () => {
-
-    console.log('Requesting snap token');
-    console.log(paymentData);
-
-    axios.post('/penyewa/bayar', {
-        TotalBayar: paymentData.TotalBayar,
-        idDetailKamar: paymentData.idDetailKamar
-    }, {
-        headers: {
-            'Content-Type': 'application/json',
-            // 'X-CSRF-TOKEN': token
-        }
-    })
-    .then((response) => {
-        console.log(response);
-            window.snap.pay(response.data.snapToken,{
+    
+    // open snap
+    const openSnapWindow = (snapToken) => {
+        window.snap.pay(snapToken,{
             onSuccess: function(result){
                 /* You may add your own implementation here */
-                alert("Pembayaran berhasil!"); console.log(result);
+                setOpenSnackbar({open:true,message:"Pembayaran berhasil!",severity:'success'}); 
             },
             onPending: function(result){
                 /* You may add your own implementation here */
-                alert("Menunggu pembayaran!"); console.log(result);
+                setOpenSnackbar({open:true,message:"Menunggu pembayaran!",severity:'pending'}); 
+
             },
             onError: function(result){
                 /* You may add your own implementation here */
-                alert("Pembayaran gagal!"); console.log(result);
+                setOpenSnackbar({open:true,message:"Pembayaran gagal!",severity:'error'}); 
+
             },
             onClose: function(){
                 /* You may add your own implementation here */
-                alert('Kamu belum bayar loh!, silahkan klik kolom riwayat transaksi yang berstatus belum bayar untuk membayar tagihanmu!');
+                // alert('Kamu belum bayar loh!, silahkan klik kolom riwayat transaksi yang berstatus belum bayar untuk membayar tagihanmu!');
+                setOpenSnackbar({open: true, message: 'Kamu belum bayar loh!, silahkan klik kolom riwayat transaksi yang berstatus belum bayar untuk membayar tagihanmu!', severity: 'warning'});
             }
         });
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
-}
+    };
+
+      
+    const getSnapToken = async () => {
+
+        console.log('Requesting snap token');
+        console.log(paymentData);
+
+        axios.post('/penyewa/bayar', {
+            TotalBayar: paymentData.TotalBayar,
+            idDetailKamar: paymentData.idDetailKamar
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                // 'X-CSRF-TOKEN': token
+            }
+        })
+        .then((response) => {
+            console.log(response);
+            openSnapWindow(response.data.snapToken);
+        })
+        .catch((error) => {
+            console.error('Error:', error.response.data.error);
+            // alert(error.response.data.error);
+            setOpenSnackbar({
+                open: true,
+                message: error.response.data.error,
+                severity: 'error'
+            });
+
+            console.log(openSnackbar);
+            
+        });
+    };
 
     const getTransactions = () => {
       axios.post('/penyewa/transactions', {
@@ -132,6 +155,11 @@ const getSnapToken = async () => {
     return (
         <div className="overflow-y-auto h-full">
             <PenyewaHeader auth={auth}/>
+            
+            {/* Snackbar notifikasi */}
+            <Snackbar open={openSnackbar.open} onClose={() => setOpenSnackbar({open: false})} autoHideDuration={6000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} >
+                <SnackbarContent style={{backgroundColor: openSnackbar.severity === 'success' ? 'green' : 'red'}} message={openSnackbar.message} />
+            </Snackbar>
 
             <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -198,6 +226,7 @@ const getSnapToken = async () => {
                                 </div>
                                 <div className="mb-4">
                                     <label className="block text-gray-700 font-bold mb-2">Jumlah yang ingin dibayar</label>
+                                    <label>Minimal Rp. {new Intl.NumberFormat('id-ID').format(minimal_pembayaran)}</label>
                                     <div className="flex items-center gap-5">
                                         <NumberInput id="InputTotalBayar" className="w-full px-4 py-2 border border-gray-300 rounded-md" onChange={(e)=>{
                                             const num = getNumber(e.target.value);
@@ -326,26 +355,7 @@ const getSnapToken = async () => {
                                 <CustomLoading/>
                             }
                             pointerOnHover
-                            onRowClicked={(row) => window.snap.pay(row.snapToken,
-                                {
-                                    onSuccess: function(result){
-                                        /* You may add your own implementation here */
-                                        alert("Pembayaran berhasil!"); console.log(result);
-                                    },
-                                    onPending: function(result){
-                                        /* You may add your own implementation here */
-                                        alert("Menunggu pembayaran!"); console.log(result);
-                                    },
-                                    onError: function(result){
-                                        /* You may add your own implementation here */
-                                        alert("Pembayaran gagal!"); console.log(result);
-                                    },
-                                    onClose: function(){
-                                        /* You may add your own implementation here */
-                                        alert('Kamu belum bayar loh!, silahkan klik kolom riwayat transaksi yang berstatus belum bayar untuk membayar tagihanmu!');
-                                    }
-                                }
-                            )}
+                            onRowClicked={(row) => openSnapWindow(row.snapToken)}
                             paginationServer
                             paginationComponent={() => (
                                 <CustomPaginationComponent

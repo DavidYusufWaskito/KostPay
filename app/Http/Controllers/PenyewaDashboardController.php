@@ -26,7 +26,7 @@ class PenyewaDashboardController extends Controller
         // return response()->json($DetailKamar->Kamar);
         
 
-        return Inertia::render('Penyewa/dashboard',['DetailKamar' => $DetailKamar,'Kamar' => $DetailKamar->Kamar,'MIDTRANS_CLIENT_KEY' => config('midtrans.client_key')]);
+        return Inertia::render('Penyewa/dashboard',['DetailKamar' => $DetailKamar,'Kamar' => $DetailKamar->Kamar,'MIDTRANS_CLIENT_KEY' => config('midtrans.client_key'),'minimal_pembayaran' => config('helper.minimal_pembayaran')]);
     }
 
 }
