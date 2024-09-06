@@ -101,6 +101,8 @@ Route::group(['middleware' => ['auth:web,admin']],function(){
     Route::post('/notifikasi',[NotificationController::class,'getNotifByPenyewa']);
     Route::post('/notifikasi/change/status',[NotificationController::class,'changeNotifStatus']);
     Route::post('/notifikasi/change/status/all',[NotificationController::class,'changeAllNotifStatusByPenyewa']);
+
+    Route::post('transaksi/update/by/snap',[TransactionController::class,'updateTransactionStatusBySnapToken']);
 });
 
 require __DIR__.'/auth.php';

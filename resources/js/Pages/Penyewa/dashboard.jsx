@@ -9,6 +9,7 @@ import StatusPembayaran from "@/Components/DatatableComponent/StatusPembayaran";
 import CustomLoading from "@/Components/DatatableComponent/CustomLoading";
 import { useMidtrans } from "@/Components/useMidtrans";
 import { Snackbar,SnackbarContent } from "@mui/material";
+import axios from "axios";
 
 export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIENT_KEY,minimal_pembayaran}) {
     const [TransactionData, setTransactionData] = useState([]);
@@ -73,6 +74,10 @@ export default function PenyewaDashboard({ auth,DetailKamar, Kamar,MIDTRANS_CLIE
             },
             onError: function(result){
                 /* You may add your own implementation here */
+                axios.post('transaksi/update/by/snap',{
+                    snapToken: snapToken,
+                    transactionStatus: 'expire'
+                });
                 setOpenSnackbar({open:true,message:"Pembayaran gagal!",severity:'error'}); 
 
             },

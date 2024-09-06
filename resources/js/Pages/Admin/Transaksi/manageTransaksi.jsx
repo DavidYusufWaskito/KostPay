@@ -42,7 +42,7 @@ export default function manageTransaksi({ auth }) {
     const paginatedData = filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
 
-    const fetchTransaction = async () => {
+    const fetchTransactionDeprecated = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
         const requestConfig = {
             method: 'POST',
@@ -60,7 +60,24 @@ export default function manageTransaksi({ auth }) {
         console.log(TransactionData)
     }
 
-    const syncTransaction = async () => {
+    const fetchTransaction = async () => {
+        setLoadingText("Memuat data...");
+        setTablePending(true);
+        axios.post('/admin/get/all/transaksi')
+            .then(response => {
+                const responseJSON = response.data;
+                console.log(responseJSON);
+                setTransactionData((e) => { return responseJSON });
+                setTablePending(false);
+                console.log(TransactionData)
+            })
+            .catch(error => {
+                console.log(error);
+                alert(error.response.data.error);
+            })
+    }
+
+    const syncTransactionDeprecated = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
         const requestConfig = {
             method: 'POST',
@@ -77,6 +94,23 @@ export default function manageTransaksi({ auth }) {
         setTransactionData((e) => { return responseJSON });
         setTablePending(false);
         console.log(TransactionData)
+    }
+
+    const syncTransaction = async () => {
+        setLoadingText("Mensinkronkan data ke midtrans...");
+        setTablePending(true);
+        axios.post('/admin/sync/all/transaksi')
+            .then(response => {
+                const responseJSON = response.data;
+                console.log(responseJSON);
+                setTransactionData((e) => { return responseJSON });
+                setTablePending(false);
+                console.log(TransactionData)
+            })
+            .catch(error => {
+                console.log(error);
+                alert(error.response.data.error);
+            })
     }
 
     useEffect(() => {

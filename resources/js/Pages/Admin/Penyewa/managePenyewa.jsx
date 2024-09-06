@@ -126,7 +126,7 @@ export default function ManagePenyewa({ auth}) {
         });
     }
 
-    const fetchPenyewa = async () => {
+    const fetchPenyewaDeprecated = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
         const requestConfig = {
             method: 'GET',
@@ -146,6 +146,21 @@ export default function ManagePenyewa({ auth}) {
         }else{
             setPenyewaData(responseJSON);
         }
+    }
+
+    const fetchPenyewa = async () => {
+        const token = document.head.querySelector('meta[name="csrf-token"]').content;
+        axios.get('/admin/get/penyewa')
+        .then((response) => {
+            if (response.status !== 200) {
+                alert('Terjadi kesalahan: ' + response.statusText);
+            }else{
+                setPenyewaData(response.data);
+            }
+        })
+        .catch((error) => {
+            console.log(error.response.data);
+        });
     }
 
     

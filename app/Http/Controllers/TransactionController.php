@@ -202,8 +202,8 @@ class TransactionController extends Controller
     // Perlu di optimisasi lagi, soal nya ini dia ngerequest setiap user refresh
     public function getTransactionsByIdPenyewa(Request $request)
     {
-        $AuthString = 'Basic ' . base64_encode(config('midtrans.server_key') . ':');
-        Log::info("Auth string: " . $AuthString);
+        // $AuthString = 'Basic ' . base64_encode(config('midtrans.server_key') . ':');
+        // Log::info("Auth string: " . $AuthString);
         $transactions = Transaksi::where('idPenyewa', $request->id)->orderBy('TanggalBayar', 'desc')->get();
 
         // foreach($transactions as $transaction){
@@ -273,5 +273,53 @@ class TransactionController extends Controller
         }
 
         return response()->json($transactions);
+    }
+
+    public function updateTransactionStatusBySnapToken(Request $request)
+    {
+        $transaction = Transaksi::where('snapToken', $request->snapToken)->first();
+        $transactionStatus = match ($request->transactionStatus) {
+            'capture' => 1,
+            'settlement' => 1,
+            'pending' => 2,
+            'failure' => 0,
+            'expire' => 4,
+            'cancel' => 3,
+            'deny' => 0,
+            default => null,
+        };
+
+        if ($transaction->StatusPembayaran !== $transactionStatus) {
+            // Update status transaksi berdasarkan status dari request
+            switch ($request->transactionStatus) {
+                case 'capture':
+                case 'settlement':
+                    $transaction->update(['StatusPembayaran' => 1]);
+                    Log::info('Payment ' . $transactionStatus . ' successfully for Order ID: ' . $transaction->id);
+                    break;
+                case 'pending':
+                    $transaction->update(['StatusPembayaran' => 2]);
+                    Log::info('Payment ' . $transactionStatus . ' for Order ID: ' . $transaction->id);
+                    break;
+                case 'cancel':
+                    $transaction->update(['StatusPembayaran' => 3]);
+                    Log::info('Payment ' . $transactionStatus . ' for Order ID: ' . $transaction->id);
+                    break;
+                case 'deny':
+                    $transaction->update(['StatusPembayaran' => 0]);
+                    Log::info('Payment ' . $transactionStatus . ' for Order ID: ' . $transaction->id);
+                    break;
+                case 'expire':
+                    $transaction->update(['StatusPembayaran' => 4]);
+                    Log::info('Payment ' . $transactionStatus . ' for Order ID: ' . $transaction->id);
+                    break;
+                default:
+                    Log::error('Invalid transaction status: ' . $transactionStatus);
+                    break;
+            }
+        }
+        else{
+            Log::info('SnapToken ' . $request->snapToken . ' already updated');
+        }
     }
 }
