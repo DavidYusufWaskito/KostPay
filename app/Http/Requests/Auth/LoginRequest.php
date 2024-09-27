@@ -44,8 +44,11 @@ class LoginRequest extends FormRequest
             'email.required' => 'Email harus diisi.',
             'email.string' => 'Email harus berupa string.',
             'email.email' => 'Email harus merupakan alamat email yang valid.',
+            'email.invalid' => 'Kredensial tidak cocok.',
             'password.required' => 'Password harus diisi.',
             'password.string' => 'Password harus berupa string.',
+            'password.invalid' => 'Kredensial tidak cocok.',
+            
         ];
     }
 
