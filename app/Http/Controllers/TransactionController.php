@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Transaksi;
 use Illuminate\Support\Facades\Log;
-use App\Models\DetailKamar;
+use App\Models\DetailSewa;
 use App\Models\Penyewa;
 use PhpParser\JsonDecoder;
 
@@ -43,7 +43,7 @@ class TransactionController extends Controller
             $Transaksi = new Transaksi();
             $Transaksi->id = $idTransaksi;
             $Transaksi->idPenyewa = auth()->user()->id;
-            $Transaksi->idDetailKamar = $request->idDetailKamar;
+            $Transaksi->idDetailSewa = $request->idDetailSewa;
             $Transaksi->TanggalBayar = date('Y-m-d H:i:s');
             $Transaksi->TotalBayar = $request->TotalBayar;
             $Transaksi->StatusPembayaran = 5;
@@ -183,11 +183,11 @@ class TransactionController extends Controller
     //     $serverKey = config('midtrans.server_key');
     //     $hashed = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
     //     if ($hashed === $request->signature_key) {
-    //         $detailKamar = DetailKamar::where('idPenyewa', auth()->user()->id)->first();
+    //         $DetailSewa = DetailSewa::where('idPenyewa', auth()->user()->id)->first();
     //         $Transaksi = new Transaksi();
     //         $Transaksi->id = $request->order_id;
     //         $Transaksi->idPenyewa = auth()->user()->id;
-    //         $Transaksi->idDetailKamar = $detailKamar->id;
+    //         $Transaksi->idDetailSewa = $DetailSewa->id;
     //         $Transaksi->TanggalBayar = date('Y-m-d');
     //         $Transaksi->TotalBayar = $request->gross_amount;
     //         if($request->transaction_status == 'capture')

@@ -12,7 +12,7 @@ import { Snackbar,SnackbarContent } from "@mui/material";
 import axios from "axios";
 export default function PenyewaDashboard({
     auth,
-    DetailKamar,
+    DetailSewa,
     Kamar,
     MIDTRANS_CLIENT_KEY,
     minimal_pembayaran,
@@ -27,7 +27,7 @@ export default function PenyewaDashboard({
 
     const [paymentData, setPaymentData] = useState({
         TotalBayar: 0,
-        idDetailKamar: DetailKamar.id,
+        idDetailSewa: DetailSewa.id,
     });
 
     // Fetching transaction data
@@ -91,7 +91,7 @@ export default function PenyewaDashboard({
                 "/penyewa/bayar",
                 {
                     TotalBayar: paymentData.TotalBayar,
-                    idDetailKamar: paymentData.idDetailKamar,
+                    idDetailSewa: paymentData.idDetailSewa,
                 },
                 {
                     headers: {
@@ -169,7 +169,7 @@ export default function PenyewaDashboard({
                     <div className="bg-white rounded shadow p-10">
                         <div className="flex justify-between items-center">
                             <div>
-                                <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(DetailKamar.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
+                                <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(DetailSewa.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
                                 <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(auth.user.tunggakan)}</p>
                             </div>
                             <button className="h-fit px-5 py-2 border border-green-500 rounded-full">

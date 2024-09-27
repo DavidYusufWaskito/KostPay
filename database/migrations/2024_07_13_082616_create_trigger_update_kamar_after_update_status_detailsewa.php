@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         DB::unprepared('
-            CREATE TRIGGER after_detail_kamar_statusAktif_update
-            AFTER UPDATE ON detail_kamar
+            CREATE TRIGGER after_detail_sewa_statusAktif_update
+            AFTER UPDATE ON detail_sewa
             FOR EACH ROW
             BEGIN
                 IF NEW.StatusAktif = 1 THEN
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared('DROP TRIGGER after_detail_kamar_statusAktif_update');
+        DB::unprepared('DROP TRIGGER after_detail_sewa_statusAktif_update');
     }
 };

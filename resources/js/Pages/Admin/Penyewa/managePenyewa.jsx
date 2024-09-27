@@ -11,7 +11,7 @@ import axios from "axios";
 
 export default function ManagePenyewa({ auth}) {
     const [penyewaData, setPenyewaData] = useState([]);
-    const [DetailKamar,setDetailKamar] = useState([]);
+    const [DetailSewa,setDetailSewa] = useState([]);
     const [kamarData,setKamarData] = useState([]);
 
     const [showAddModal, setShowAddModal] = useState(false);
@@ -46,7 +46,7 @@ export default function ManagePenyewa({ auth}) {
     useEffect(() => {
         reset();
         fetchPenyewa();
-        fetchDetailKamar();
+        fetchDetailSewa();
         fetchKamar();
     }, [])
     
@@ -98,15 +98,15 @@ export default function ManagePenyewa({ auth}) {
         setCurrentPage(newPage);
     };
 
-    const fetchDetailKamar = async () => {
+    const fetchDetailSewa = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        const response = await axios.post('/admin/get/all/detailKamar', {
+        const response = await axios.post('/admin/get/all/detailSewa', {
             headers: {
                 'X-CSRF-TOKEN': token
             }
         }).then((response) => {
             console.log(response.data);
-            setDetailKamar(response.data);
+            setDetailSewa(response.data);
         }).catch((error) => {
             console.log(error.response.data);
         });
@@ -268,7 +268,7 @@ export default function ManagePenyewa({ auth}) {
 
     const createDetailSewa = async (id) => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        const response = axios.post('/admin/add/detailKamar', {
+        const response = axios.post('/admin/add/detailSewa', {
             id: id
         }, {
             headers: {
@@ -277,7 +277,7 @@ export default function ManagePenyewa({ auth}) {
         })
         .then((response) => {
             console.log(response.data);
-            fetchDetailKamar();
+            fetchDetailSewa();
             fetchPenyewa();
         })
         .catch((error) => {
@@ -288,7 +288,7 @@ export default function ManagePenyewa({ auth}) {
     const openDetailSewaModal = (rowData) => {
         setDetailSewaModal({ show: true, rowData: rowData});
         console.log(rowData);
-        let filteredDetailSewa = DetailKamar.filter((item) => {
+        let filteredDetailSewa = DetailSewa.filter((item) => {
             return (
                 item.idPenyewa === rowData.id
             );
@@ -309,7 +309,7 @@ export default function ManagePenyewa({ auth}) {
 
     const onEditDetailSewa = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        axios.post('/admin/update/detailKamar', {
+        axios.post('/admin/update/detailSewa', {
             id: DetailSewaFormData.id,
             idPenyewa: DetailSewaFormData.idPenyewa,
             idKamar: DetailSewaFormData.idKamar,
@@ -325,7 +325,7 @@ export default function ManagePenyewa({ auth}) {
             setDetailSewaModal((prevState) => ({ ...prevState, editMode: false }));
             fetchKamar();
             fetchPenyewa();
-            fetchDetailKamar();
+            fetchDetailSewa();
         })
         .catch((error) => {
             alert('Terjadi kesalahan: ' + error.response?.data?.message || error.message);
@@ -382,8 +382,8 @@ export default function ManagePenyewa({ auth}) {
                                 {
                                     name: 'Status penyewaan',
                                     cell: (row) => (
-                                        // const detailKamar = DetailKamar.find(detail => detail.idPenyewa === row.id);
-                                        // return detailKamar ? detailKamar.idKamar : "Belum menyewa kamar";
+                                        // const detailSewa = DetailSewa.find(detail => detail.idPenyewa === row.id);
+                                        // return detailSewa ? detailSewa.idKamar : "Belum menyewa kamar";
                                         <div className="flex justify-center gap-5">
                                             <button onClick={(e)=>{
                                                 e.preventDefault();
@@ -544,7 +544,7 @@ export default function ManagePenyewa({ auth}) {
                             </h1>
                             <div className="flex justify-end mt-4">
                                 {
-                                    DetailSewaModal.show && DetailKamar.filter(detail => detail.idPenyewa === DetailSewaModal.rowData.id).length > 0 ? (
+                                    DetailSewaModal.show && DetailSewa.filter(detail => detail.idPenyewa === DetailSewaModal.rowData.id).length > 0 ? (
                                         <button className={"bg-blue-100 text-blue-500 font-bold py-2 px-4 rounded-full"} onClick={() => setDetailSewaModal({...DetailSewaModal,editMode: !DetailSewaModal.editMode})}>
                                             <span className="pr-2">Edit</span>
                                             <FontAwesomeIcon className={"text-xl " + (DetailSewaModal.editMode ? "text-green-500" : "text-blue-500")} icon={
@@ -555,8 +555,8 @@ export default function ManagePenyewa({ auth}) {
                                 }
                             </div>
                             <div className="mt-4">
-                                {DetailSewaModal.show && DetailKamar.filter(detail => detail.idPenyewa === DetailSewaModal.rowData.id).length > 0 ? (
-                                    DetailKamar.filter(detail => detail.idPenyewa === DetailSewaModal.rowData.id).map(detail => (
+                                {DetailSewaModal.show && DetailSewa.filter(detail => detail.idPenyewa === DetailSewaModal.rowData.id).length > 0 ? (
+                                    DetailSewa.filter(detail => detail.idPenyewa === DetailSewaModal.rowData.id).map(detail => (
                                         <div key={detail.id} className="block">
                                             <div className="flex flex-col w-[100%] items-start justify-between gap-5 mt-4">
                                                 <div className="flex w-full justify-between">

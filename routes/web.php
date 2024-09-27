@@ -9,8 +9,8 @@ use App\Http\Controllers\PenyewaController;
 use App\Http\Controllers\PenyewaDashboardController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\KamarController;
-use App\Models\DetailKamar;
-use App\Http\Controllers\DetailKamarController;
+use App\Models\DetailSewa;
+use App\Http\Controllers\DetailSewaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -74,9 +74,9 @@ Route::group(['middleware' => ['auth:admin']],function(){
     Route::post('/admin/manage/penyewa/update',[PenyewaController::class,'updatePenyewa'])->name('admin.manage.penyewa.update');
     Route::post('/admin/manage/penyewa/delete',[PenyewaController::class,'onDestroy'])->name('admin.manage.penyewa.destroy');
 
-    Route::post('/admin/get/all/detailKamar',[DetailKamarController::class,'getAllDetailKamar'])->name('admin.get.all.detailKamar');
-    Route::post('/admin/add/detailKamar',[PenyewaController::class,'createDetailKamar'])->name('admin.add.detailKamar');
-    Route::post('/admin/update/detailKamar',[DetailKamarController::class,'onEdit'])->name('admin.update.detailKamar');
+    Route::post('/admin/get/all/detailSewa',[DetailSewaController::class,'getAllDetailSewa'])->name('admin.get.all.detailSewa');
+    Route::post('/admin/add/detailSewa',[PenyewaController::class,'createDetailSewa'])->name('admin.add.detailSewa');
+    Route::post('/admin/update/detailSewa',[DetailSewaController::class,'onEdit'])->name('admin.update.detailSewa');
 
     Route::get('/admin/manage/transaksi',[AdminController::class,'v_ManageTransaksi'])->name('admin.manage.transaksi');
     Route::post('/admin/get/all/transaksi',[TransactionController::class,'getAllTransaction'])->name('admin.get.all.transaction');

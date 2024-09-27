@@ -12,15 +12,15 @@ class Transaksi extends Model
     public $timestamps = false;
     protected $fillable = [
         'id',
-        'idPenyewa',
-        'idDetailKamar',
+        'idTagihan',
         'TanggalBayar',
         'TotalBayar',
         'StatusPembayaran'
     ];
-    public function DetailKamar()
+
+    public function Tagihan()
     {
-        return $this->belongsTo(DetailKamar::class,'idDetailKamar');
+        return $this->hasOne(Tagihan::class,'idTagihan');
     }
 
     public function Penyewa()

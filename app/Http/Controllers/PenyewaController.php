@@ -6,7 +6,7 @@ use App\Models\Penyewa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Kamar;
-use App\Models\DetailKamar;
+use App\Models\DetailSewa;
 class PenyewaController extends Controller
 {
     
@@ -72,16 +72,16 @@ class PenyewaController extends Controller
 
     }
 
-    public function createDetailKamar(Request $request)
+    public function createDetailSewa(Request $request)
     {
         $kamar = Kamar::where('StatusKamar',0)->first();
 
         if($kamar){
-            $detailSewa = new DetailKamar([
+            $detailSewa = new DetailSewa([
                 'idKamar' => $kamar->id,
                 'idPenyewa' => $request->id,
                 'TanggalSewa' => date('Y-m-d'),
-                'TanggalJatuhTempo' => (new \Carbon\Carbon())->addMonth()->format('Y-m-d')
+                // 'TanggalJatuhTempo' => (new \Carbon\Carbon())->addMonth()->format('Y-m-d')
             ]);
 
             if($detailSewa->save()){

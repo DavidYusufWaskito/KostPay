@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('detail_kamar', function (Blueprint $table) {
+        Schema::create('detail_sewa', function (Blueprint $table) {
             $table->id();
             $table->foreignId('idKamar')->constrained('kamar');
             $table->foreignId('idPenyewa')->constrained('penyewa');
             $table->date('TanggalSewa')->nullable();
-            $table->date('TanggalJatuhTempo')->nullable();
-            $table->timestamps();
+            $table->integer('StatusAktif')->default(1);
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('detail_kamar');
+        Schema::dropIfExists('detail_sewa');
     }
 };
