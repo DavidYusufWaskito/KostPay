@@ -69,7 +69,7 @@ Route::group(['middleware' => ['auth:admin']],function(){
     Route::get('/admin/notif',[AdminController::class,'v_Notifikasi'])->name('admin.notifikasi');
     Route::post('/admin/send/notif',[NotificationController::class,'sendNotif']);
 
-    Route::get('/admin/get/penyewa',[PenyewaController::class,'getPenyewa'])->name('admin.get.penyewa');
+    Route::get('/admin/get/penyewa',[PenyewaController::class,'getAllPenyewa'])->name('admin.get.all.penyewa');
 
     Route::post('/admin/manage/penyewa/store',[PenyewaController::class,'storePenyewa'])->name('admin.manage.penyewa.store');
     Route::post('/admin/manage/penyewa/update',[PenyewaController::class,'updatePenyewa'])->name('admin.manage.penyewa.update');

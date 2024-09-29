@@ -41,8 +41,8 @@ export default function ManageKamar({ auth, DetailKamar}) {
         if(EditModal.show){
             setData((prevData) => ({
                 ...prevData,
-                HargaSewa:EditModal.rowData?.hargaSewa,
-                StatusKamar:EditModal.rowData?.status
+                HargaSewa:EditModal.rowData?.HargaSewa,
+                StatusKamar:EditModal.rowData?.StatusKamar
             }));
         }
     },[EditModal.show,EditModal.rowData]);
@@ -64,7 +64,7 @@ export default function ManageKamar({ auth, DetailKamar}) {
 
     const fetchKamar = async () => {
         try {
-            const response = await axios.get('/admin/get/all/kamar', {
+            const response = await axios.get('/api/admin/kamar', {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
@@ -89,7 +89,7 @@ export default function ManageKamar({ auth, DetailKamar}) {
 
     const onStore = async () => {
 
-        const response = await axios.post('/admin/manage/kamar/store', {
+        const response = await axios.post('/api/admin/kamar', {
             HargaSewa: data.HargaSewa,
             StatusKamar: data.StatusKamar
         }, {
@@ -107,11 +107,12 @@ export default function ManageKamar({ auth, DetailKamar}) {
 
     }
 
-    const onEdit = async () => {
+    const onEdit = async (idKamar) => {
         try {
-            const response = await axios.post('/admin/manage/kamar/update', {
-                id: EditModal.rowData?.id,
-                hargaSewa: data.HargaSewa
+            const response = await axios.put('/api/admin/kamar/' + idKamar, {
+                // id: EditModal.rowData?.id,
+                HargaSewa: data.HargaSewa,
+                StatusKamar: data.StatusKamar
             }, {
                 headers: {
                     'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
@@ -124,13 +125,10 @@ export default function ManageKamar({ auth, DetailKamar}) {
         }
     }
 
-    const onDelete = async () => {
+    const onDelete = async (idKamar) => {
         console.log("requesting delete");
 
-        await axios.post('/admin/manage/kamar/delete', {
-            id: DeleteModal.rowID
-
-        }, {
+        await axios.delete('/api/admin/kamar/' + idKamar, {
             headers: {
                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
             }
@@ -193,6 +191,7 @@ export default function ManageKamar({ auth, DetailKamar}) {
                                         <div className="flex justify-center gap-5">
                                             <button onClick={(e)=>{
                                                 e.preventDefault();
+
                                                 setEditModal({show:true,rowData:row});
                                             }} className="text-xl text-indigo-600 hover:text-indigo-900">
                                                 <FontAwesomeIcon icon={faEdit} />
@@ -286,7 +285,7 @@ export default function ManageKamar({ auth, DetailKamar}) {
                                 <div className={"flex gap-5"}>
                                     <button onClick={(e)=>{
                                         e.preventDefault();
-                                        onEdit();
+                                        onEdit(EditModal.rowData?.id);
                                     }} type="submit" className="bg-blue-500 text-white px-4 py-2 w-full rounded-md">Submit</button>
                                     <button onClick={() => setEditModal({show:false,rowData:null})} className="bg-red-500 text-white px-4 py-2 w-[30%] rounded-md">Batal</button>
                                 </div>
@@ -310,7 +309,7 @@ export default function ManageKamar({ auth, DetailKamar}) {
                                 <p className="text-center">Apakah anda yakin ingin menghapus data ini?</p>
                             </div>
                             <div className="flex justify-end mt-4 gap-5">
-                                <button onClick={() => onDelete()} className="text-red rounded-lg hover:before:bg-redborder-red-500 relative h-[50px] w-40 overflow-hidden border border-red-500 bg-white px-3 text-red-500 shadow-2xl transition-all before:absolute before:bottom-0 before:left-0 before:top-0 before:z-0 before:h-full before:w-0 before:bg-red-500 before:transition-all before:duration-500 hover:text-white hover:shadow-red-500 hover:before:left-0 hover:before:w-full"><span className="relative z-10">Ya</span></button>
+                                <button onClick={() => onDelete(DeleteModal.rowID)} className="text-red rounded-lg hover:before:bg-redborder-red-500 relative h-[50px] w-40 overflow-hidden border border-red-500 bg-white px-3 text-red-500 shadow-2xl transition-all before:absolute before:bottom-0 before:left-0 before:top-0 before:z-0 before:h-full before:w-0 before:bg-red-500 before:transition-all before:duration-500 hover:text-white hover:shadow-red-500 hover:before:left-0 hover:before:w-full"><span className="relative z-10">Ya</span></button>
                                 <button onClick={() => setDeleteModal({show:false,rowID:1})} className="border border-blue-500 text-blue-500 px-5 py-2 rounded-md mr-2 transition-all duration-300 hover:bg-blue-500 hover:text-white">Tidak</button>
                             </div>
                         </div>

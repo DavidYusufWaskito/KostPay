@@ -34,9 +34,24 @@ class KamarController extends Controller
 
     }
 
-    public function onDestroy(Request $request)
+    public function updateKamar(Request $request, $idKamar)
     {
-        $Kamar = Kamar::find($request->id);
+        $request->validate([
+            'HargaSewa' => 'required',
+        ],[
+            'HargaSewa.required' => 'Harga Sewa harus diisi',
+        ]);
+
+        $Kamar = Kamar::findOrFail($idKamar);
+        $Kamar->HargaSewa = $request->HargaSewa;
+        $Kamar->StatusKamar = $request->StatusKamar;
+        $Kamar->save();
+        return response()->json($Kamar, 200);
+    }
+
+    public function onDestroy($idKamar)
+    {
+        $Kamar = Kamar::find($idKamar);
 
         if ($Kamar) {
 

@@ -1,5 +1,5 @@
 import { Head, Link } from "@inertiajs/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import PenyewaHeader from "@/Layouts/Penyewa/PenyewaHeader";
 import DataTable from "react-data-table-component";
 import CustomPaginationComponent from "@/Components/DatatableComponent/CustomPagination";
@@ -151,9 +151,7 @@ export default function PenyewaDashboard({
     };
 
     const getTagihan = () => {
-        axios.post("api/get/tagihan/by/detailSewa",{
-            idDetailSewa: DetailSewa.id
-        }).then((response) => {
+        axios.get("api/tagihan/detail-sewa/" + DetailSewa.id).then((response) => {
             setTagihanData((e) => {
                 return response.data;
             });

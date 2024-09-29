@@ -12,9 +12,15 @@ class PenyewaController extends Controller
     
 
 
-    public function getPenyewa(Request $request)
+    public function getAllPenyewa(Request $request)
     {
         $Penyewa = Penyewa::all();
+        return response()->json($Penyewa, 200);
+    }
+
+    public function getPenyewaById($idPenyewa)
+    {
+        $Penyewa = Penyewa::find($idPenyewa);
         return response()->json($Penyewa, 200);
     }
 

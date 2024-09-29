@@ -100,7 +100,7 @@ export default function ManagePenyewa({ auth}) {
 
     const fetchDetailSewa = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        const response = await axios.post('/admin/get/all/detailSewa', {
+        const response = await axios.get('/api/admin/detail-sewa', {
             headers: {
                 'X-CSRF-TOKEN': token
             }
@@ -114,7 +114,7 @@ export default function ManagePenyewa({ auth}) {
 
     const fetchKamar = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        const response = await axios.get('/admin/get/all/kamar', {
+        const response = await axios.get('/api/admin/kamar', {
             headers: {
                 'X-CSRF-TOKEN': token
             }
@@ -150,7 +150,7 @@ export default function ManagePenyewa({ auth}) {
 
     const fetchPenyewa = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
-        axios.get('/admin/get/penyewa')
+        axios.get('/api/admin/penyewa')
         .then((response) => {
             if (response.status !== 200) {
                 alert('Terjadi kesalahan: ' + response.statusText);
