@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Tagihan extends Model
 {
     use HasFactory;
+    protected $table = 'tagihan';
     public $timestamps = false;
     protected $fillable = [
         'id',
@@ -15,6 +16,7 @@ class Tagihan extends Model
         'JumlahTagihan',
         'TanggalTagihan',
         'TanggalJatuhTempo',
+        'StatusTagihan'
     ];
 
     public function detailSewa()

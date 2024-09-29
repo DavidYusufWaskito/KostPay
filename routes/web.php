@@ -12,6 +12,7 @@ use App\Http\Controllers\KamarController;
 use App\Models\DetailSewa;
 use App\Http\Controllers\DetailSewaController;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\TagihanController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -95,6 +96,7 @@ Route::group(['middleware' => ['auth:web']],function(){
     Route::get('/penyewa',[PenyewaDashboardController::class,'index'])->name('penyewa.dashboard');
     Route::post('/penyewa/bayar',[TransactionController::class,'checkOut'])->name('penyewa.bayar');
     Route::post('/penyewa/transactions',[TransactionController::class,'getTransactionsByIdPenyewa'])->name('penyewa.transactions');
+    Route::post('/penyewa/tagihan/get/detailSewa',[TagihanController::class,'getTagihanByDetailSewaId']);
 });
 Route::group(['middleware' => ['auth:web,admin']],function(){
     

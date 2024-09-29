@@ -9,6 +9,8 @@ import StatusPembayaran from "@/Components/DatatableComponent/StatusPembayaran";
 import CustomLoading from "@/Components/DatatableComponent/CustomLoading";
 import { useMidtrans } from "@/Components/useMidtrans";
 import { Snackbar,SnackbarContent } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMoneyBill,faClipboard } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 export default function PenyewaDashboard({
     auth,
@@ -18,6 +20,7 @@ export default function PenyewaDashboard({
     minimal_pembayaran,
 }) {
     const [TransactionData, setTransactionData] = useState([]);
+    const [TagihanData, setTagihanData] = useState([]);
     const [showBayarModal, setShowBayarModal] = useState(false);
     const [openSnackbar, setOpenSnackbar] = useState({
         open: false,
@@ -32,7 +35,8 @@ export default function PenyewaDashboard({
 
     // Fetching transaction data
     useEffect(() => {
-        getTransactions();
+        // getTransactions();
+        getTagihan();
     }, []);
 
     // Pakai midtrans
@@ -146,6 +150,18 @@ export default function PenyewaDashboard({
             });
     };
 
+    const getTagihan = () => {
+        axios.post("api/get/tagihan/by/detailSewa",{
+            idDetailSewa: DetailSewa.id
+        }).then((response) => {
+            setTagihanData((e) => {
+                return response.data;
+            });
+
+            console.log(response.data);
+        })
+    };
+
     const handleBayarClick = () => {
         getSnapToken();
     };
@@ -167,7 +183,24 @@ export default function PenyewaDashboard({
             <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white rounded shadow p-10">
-                        <div className="flex justify-between items-center">
+                    {
+                        TagihanData.length > 0 ?
+                            TagihanData.map((data, index) => {
+                                return (
+                                    <div key={index} className="flex justify-between items-center">
+                                        <div>
+                                            <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(data.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
+                                            <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(data.JumlahTagihan)}</p>
+                                        </div>
+                                        <button onClick={handleBayarClick} className="h-fit px-5 py-2 border border-green-500 rounded-full">
+                                            <p className="text-lg font-bold text-green-500">Bayar</p>
+                                        </button>
+                                    </div>
+                                );
+                            }):
+                            <p className="text-center text-2xl font-bold">Hore tidak ada tagihan</p>
+                    }
+                        {/* <div className="flex justify-between items-center">
                             <div>
                                 <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(DetailSewa.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
                                 <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(auth.user.tunggakan)}</p>
@@ -175,7 +208,17 @@ export default function PenyewaDashboard({
                             <button className="h-fit px-5 py-2 border border-green-500 rounded-full">
                                 <p className="text-lg font-bold text-green-500">Bayar</p>
                             </button>
-                        </div>
+                        </div> */}
+                    </div>
+                    <div className="bg-white mt-5 shadow flex flex-col gap-2">
+                        <button className="flex items-center p-5 w-full">
+                            <FontAwesomeIcon icon={faMoneyBill} className="text-4xl w-20"/>
+                            <p className="text-lg font-bold">Daftar tagihan</p>
+                        </button>
+                        <button className="flex items-center p-5 w-full">
+                            <FontAwesomeIcon icon={faClipboard} className="text-4xl w-20"/>
+                            <p className="text-lg font-bold">Riwayat transaksi</p>
+                        </button>
                     </div>
                 </div>
             </div>
