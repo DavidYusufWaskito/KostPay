@@ -5,22 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Transaksi extends Model
+class DetailSewa extends Model
 {
     use HasFactory;
-    protected $table = 'transaksi';
+    protected $table = 'detail_sewa';
     public $timestamps = false;
     protected $fillable = [
-        'id',
-        'idTagihan',
-        'TanggalBayar',
-        'TotalBayar',
-        'StatusPembayaran'
+        'idKamar',
+        'idPenyewa',
+        'TanggalSewa',
+        'StatusAktif'
     ];
 
-    public function Tagihan()
+
+    public function Kamar()
     {
-        return $this->hasOne(Tagihan::class,'idTagihan');
+        return $this->belongsTo(Kamar::class,'idKamar');
     }
 
     public function Penyewa()

@@ -14,12 +14,12 @@ return new class extends Migration
     {
 
         DB::statement('
-            CREATE TRIGGER before_insert_detail_kamar
-            BEFORE INSERT ON detail_kamar
+            CREATE TRIGGER before_insert_detail_sewa
+            BEFORE INSERT ON detail_sewa
             FOR EACH ROW
             BEGIN
             
-                SELECT idKamar INTO @idKamar FROM detail_kamar WHERE NEW.idKamar = @idKamar;
+                SELECT idKamar INTO @idKamar FROM detail_sewa WHERE NEW.idKamar = @idKamar;
                 SELECT StatusKamar INTO @statusKamar FROM kamar WHERE id = @idKamar;
             
                 IF @statusKamar = 1 THEN
@@ -30,12 +30,12 @@ return new class extends Migration
             ');
 
 
-        // Membuat trigger untuk mengubah status kamar menjadi vacant (0) atau occupied (1) setelah update detail_kamar
+        // Membuat trigger untuk mengubah status kamar menjadi vacant (0) atau occupied (1) setelah update detail_sewa
         // Jika penyewa yang sudah menyewa kamar dan mendapatkan detail kamar pindah kamar namun tunggakan nya jangan ikut naik
         
         DB::statement('
-            CREATE TRIGGER update_status_kamar_after_update_detail_kamar
-            AFTER UPDATE ON detail_kamar
+            CREATE TRIGGER update_status_kamar_after_update_detail_sewa
+            AFTER UPDATE ON detail_sewa
             FOR EACH ROW
             BEGIN
                 IF NEW.idKamar <> OLD.idKamar THEN
@@ -49,8 +49,8 @@ return new class extends Migration
                         SET StatusKamar = 1
                         WHERE id = NEW.idKamar;
 
-                        -- Cek apakah tidak ada detail_kamar lagi untuk kamar lama (OLD.idKamar)
-                        SELECT COUNT(*) INTO @count FROM detail_kamar WHERE idKamar = OLD.idKamar;
+                        -- Cek apakah tidak ada detail_sewa lagi untuk kamar lama (OLD.idKamar)
+                        SELECT COUNT(*) INTO @count FROM detail_sewa WHERE idKamar = OLD.idKamar;
                         IF @count = 0 THEN
                             UPDATE kamar
                             SET StatusKamar = 0
@@ -68,7 +68,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('DROP TRIGGER IF EXISTS before_insert_detail_kamar');
-        DB::statement('DROP TRIGGER IF EXISTS update_status_kamar_after_update_detail_kamar');
+        DB::statement('DROP TRIGGER IF EXISTS before_insert_detail_sewa');
+        DB::statement('DROP TRIGGER IF EXISTS update_status_kamar_after_update_detail_sewa');
     }
 };

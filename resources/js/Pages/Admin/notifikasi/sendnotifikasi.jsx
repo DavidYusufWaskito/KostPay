@@ -25,7 +25,7 @@ export default function sendNotifikasi({ auth }) {
         fetchPenyewa();
     }, []);
 
-    const fetchPenyewa = async () => {
+    const fetchPenyewaDeprecated = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
         const requestConfig = {
             method: 'GET',
@@ -46,7 +46,22 @@ export default function sendNotifikasi({ auth }) {
 
     }
 
-    const sendNotifikasi = async () => {
+    const fetchPenyewa = async () => {
+        const token = document.head.querySelector('meta[name="csrf-token"]').content;
+        axios.get('/api/admin/penyewa')
+        .then((response) => {
+            if (response.status !== 200) {
+                alert('Terjadi kesalahan: ' + response.statusText);
+            }else{
+                setPenyewaData(response.data);
+            }
+        })
+        .catch((error) => {
+            console.log(error.response.data);
+        });
+    }
+
+    const sendNotifikasiDeprecated = async () => {
         const token = document.head.querySelector('meta[name="csrf-token"]').content;
         const requestConfig = {
             method: 'POST',
@@ -78,6 +93,37 @@ export default function sendNotifikasi({ auth }) {
         {
             setAlertOpen({open: true, message: responseJSON.error, severity: "error"});
         }
+    }
+
+    const sendNotifikasi = async () => {
+        const token = document.head.querySelector('meta[name="csrf-token"]').content;
+
+        const response = await axios.post('/api/admin/notifikasi', {
+            idPenyewa: formData.idPenyewa,
+            idAdmin: auth.user.id,
+            Pesan: formData.Pesan
+        })
+        .then((response) => {
+            console.log(response.data);
+            if (response.status === 200)
+            {
+                // alert("Notifikasi Terkirim");
+                setAlertOpen({open: true, message: response.data.message, severity: "success"});
+
+                setFormData({ ...formData ,
+                    idAdmin: auth.user.id,
+                    Pesan:"",
+                });
+            }
+            else
+            {
+                setAlertOpen({open: true, message: response.data.error, severity: "error"});
+            }
+            return response;
+        })
+        .catch((error) => {
+            console.log(error.response.data);
+        });
     }
 
     return (

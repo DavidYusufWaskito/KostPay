@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Transaksi;
 use Illuminate\Support\Facades\Log;
-use App\Models\DetailKamar;
+use App\Models\DetailSewa;
 use App\Models\Penyewa;
 use PhpParser\JsonDecoder;
 
@@ -25,6 +25,10 @@ class TransactionController extends Controller
                 return response()->json(['error' => 'Selesaikan transaksi terlebih dahulu (Id transaksi: ' . $transaction->id . ', total: Rp. ' . $transaction->TotalBayar . ')'], 400);
             }
 
+            if ($request->TotalBayar < config('helper.minimal_pembayaran') && !(auth()->user()->Tunggakan < config('helper.minimal_pembayaran'))){
+                return response()->json(['error' => 'Total Bayar minimal Rp. ' . config('helper.minimal_pembayaran')], 400);
+            }
+
             if ($request->TotalBayar > auth()->user()->tunggakan) {
                 return response()->json(['error' => 'Total Bayar melebihi tunggakan'], 400);
             } elseif ($request->TotalBayar == 0) {
@@ -39,7 +43,7 @@ class TransactionController extends Controller
             $Transaksi = new Transaksi();
             $Transaksi->id = $idTransaksi;
             $Transaksi->idPenyewa = auth()->user()->id;
-            $Transaksi->idDetailKamar = $request->idDetailKamar;
+            $Transaksi->idDetailSewa = $request->idDetailSewa;
             $Transaksi->TanggalBayar = date('Y-m-d H:i:s');
             $Transaksi->TotalBayar = $request->TotalBayar;
             $Transaksi->StatusPembayaran = 5;
@@ -179,11 +183,11 @@ class TransactionController extends Controller
     //     $serverKey = config('midtrans.server_key');
     //     $hashed = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
     //     if ($hashed === $request->signature_key) {
-    //         $detailKamar = DetailKamar::where('idPenyewa', auth()->user()->id)->first();
+    //         $DetailSewa = DetailSewa::where('idPenyewa', auth()->user()->id)->first();
     //         $Transaksi = new Transaksi();
     //         $Transaksi->id = $request->order_id;
     //         $Transaksi->idPenyewa = auth()->user()->id;
-    //         $Transaksi->idDetailKamar = $detailKamar->id;
+    //         $Transaksi->idDetailSewa = $DetailSewa->id;
     //         $Transaksi->TanggalBayar = date('Y-m-d');
     //         $Transaksi->TotalBayar = $request->gross_amount;
     //         if($request->transaction_status == 'capture')
@@ -198,8 +202,8 @@ class TransactionController extends Controller
     // Perlu di optimisasi lagi, soal nya ini dia ngerequest setiap user refresh
     public function getTransactionsByIdPenyewa(Request $request)
     {
-        $AuthString = 'Basic ' . base64_encode(config('midtrans.server_key') . ':');
-        Log::info("Auth string: " . $AuthString);
+        // $AuthString = 'Basic ' . base64_encode(config('midtrans.server_key') . ':');
+        // Log::info("Auth string: " . $AuthString);
         $transactions = Transaksi::where('idPenyewa', $request->id)->orderBy('TanggalBayar', 'desc')->get();
 
         // foreach($transactions as $transaction){
@@ -269,5 +273,53 @@ class TransactionController extends Controller
         }
 
         return response()->json($transactions);
+    }
+
+    public function updateTransactionStatusBySnapToken(Request $request)
+    {
+        $transaction = Transaksi::where('snapToken', $request->snapToken)->first();
+        $transactionStatus = match ($request->transactionStatus) {
+            'capture' => 1,
+            'settlement' => 1,
+            'pending' => 2,
+            'failure' => 0,
+            'expire' => 4,
+            'cancel' => 3,
+            'deny' => 0,
+            default => null,
+        };
+
+        if ($transaction->StatusPembayaran !== $transactionStatus) {
+            // Update status transaksi berdasarkan status dari request
+            switch ($request->transactionStatus) {
+                case 'capture':
+                case 'settlement':
+                    $transaction->update(['StatusPembayaran' => 1]);
+                    Log::info('Payment ' . $transactionStatus . ' successfully for Order ID: ' . $transaction->id);
+                    break;
+                case 'pending':
+                    $transaction->update(['StatusPembayaran' => 2]);
+                    Log::info('Payment ' . $transactionStatus . ' for Order ID: ' . $transaction->id);
+                    break;
+                case 'cancel':
+                    $transaction->update(['StatusPembayaran' => 3]);
+                    Log::info('Payment ' . $transactionStatus . ' for Order ID: ' . $transaction->id);
+                    break;
+                case 'deny':
+                    $transaction->update(['StatusPembayaran' => 0]);
+                    Log::info('Payment ' . $transactionStatus . ' for Order ID: ' . $transaction->id);
+                    break;
+                case 'expire':
+                    $transaction->update(['StatusPembayaran' => 4]);
+                    Log::info('Payment ' . $transactionStatus . ' for Order ID: ' . $transaction->id);
+                    break;
+                default:
+                    Log::error('Invalid transaction status: ' . $transactionStatus);
+                    break;
+            }
+        }
+        else{
+            Log::info('SnapToken ' . $request->snapToken . ' already updated');
+        }
     }
 }

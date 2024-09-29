@@ -5,14 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Penyewa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Kamar;
+use App\Models\DetailSewa;
 class PenyewaController extends Controller
 {
     
 
 
-    public function getPenyewa(Request $request)
+    public function getAllPenyewa(Request $request)
     {
         $Penyewa = Penyewa::all();
+        return response()->json($Penyewa, 200);
+    }
+
+    public function getPenyewaById($idPenyewa)
+    {
+        $Penyewa = Penyewa::find($idPenyewa);
         return response()->json($Penyewa, 200);
     }
 
@@ -68,5 +76,37 @@ class PenyewaController extends Controller
         }
         return response()->json(['message' => 'Tidak terhapus','success' => 0], 400);
 
+    }
+
+    public function createDetailSewa(Request $request)
+    {
+        $kamar = Kamar::where('StatusKamar',0)->first();
+
+        if($kamar){
+            $detailSewa = new DetailSewa([
+                'idKamar' => $kamar->id,
+                'idPenyewa' => $request->id,
+                'TanggalSewa' => date('Y-m-d'),
+                // 'TanggalJatuhTempo' => (new \Carbon\Carbon())->addMonth()->format('Y-m-d')
+            ]);
+
+            if($detailSewa->save()){
+                $kamar->StatusKamar = 1;
+                $kamar->save();
+                return response()->json([
+                    'message' => 'Berhasil membuat detail kamar'
+                ],200);
+            }else{
+                return response()->json([
+                    'message' => 'Gagal membuat detail kamar'
+                ],400);
+            }
+        }else{
+            return response()->json([
+                'message' => 'Tidak ada kamar yang tersedia'
+            ],400);
+        }
+
+        
     }
 }

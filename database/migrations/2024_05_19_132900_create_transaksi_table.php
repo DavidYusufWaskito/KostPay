@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('transaksi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('idPenyewa')->constrained('penyewa');
-            $table->foreignId('idDetailKamar')->constrained('detail_kamar');
-            $table->date('TanggalBayar');
+            $table->foreignId('idTagihan')->constrained('tagihan');
+            // $table->foreignId('idDetailKamar')->constrained('detail_kamar');
+            $table->datetime('TanggalBayar')->nullable();
             $table->integer('TotalBayar');
             $table->integer('StatusPembayaran');
+            $table->string('snapToken')->nullable();
         });
     }
 

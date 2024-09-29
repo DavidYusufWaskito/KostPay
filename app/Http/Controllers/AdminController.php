@@ -8,7 +8,7 @@ use App\Models\Admin;
 use App\Models\Kamar;
 use App\Models\Transaksi;
 use App\Models\Penyewa;
-use App\Models\DetailKamar;
+use App\Models\DetailSewa;
 class AdminController extends Controller
 {
     //
@@ -21,8 +21,13 @@ class AdminController extends Controller
 
     public function v_ManagePenyewa(Request $request)
     {
-        $DetailKamar = DetailKamar::all();
-        return Inertia::render('Admin/Penyewa/managePenyewa',['DetailKamar' => $DetailKamar]);
+        $DetailSewa = DetailSewa::all();
+        return Inertia::render('Admin/Penyewa/managePenyewa',['DetailSewa' => $DetailSewa]);
+    }
+
+    public function v_ManageKamar(Request $request)
+    {
+        return Inertia::render('Admin/Kamar/manageKamar');
     }
 
     public function v_ManageTransaksi(Request $request)
