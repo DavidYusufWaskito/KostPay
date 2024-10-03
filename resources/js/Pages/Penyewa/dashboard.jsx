@@ -164,11 +164,6 @@ export default function PenyewaDashboard({
         getSnapToken();
     };
 
-    const getNumber = (_str) => {
-        const arr = _str.split("");
-        const out = arr.filter((c) => !isNaN(c)).join("");
-        return Number(out);
-    };
     return (
         <div className="overflow-y-auto h-full">
             <PenyewaHeader auth={auth}/>
@@ -179,8 +174,8 @@ export default function PenyewaDashboard({
             </Snackbar>
 
             <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white rounded shadow p-10">
+                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white rounded border border-gray-200 p-10">
                     {
                         TagihanData.length > 0 ?
                             TagihanData.map((data, index) => {
@@ -190,9 +185,12 @@ export default function PenyewaDashboard({
                                             <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(data.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
                                             <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(data.JumlahTagihan)}</p>
                                         </div>
-                                        <button onClick={handleBayarClick} className="h-fit px-5 py-2 border border-green-500 rounded-full">
+                                        {/* <button onClick={handleBayarClick} className="h-fit px-5 py-2 border border-green-500 rounded-full">
                                             <p className="text-lg font-bold text-green-500">Bayar</p>
-                                        </button>
+                                        </button> */}
+                                        <Link href={route('penyewa.detailbayar', {idTagihan: data.id})} className="h-fit px-5 py-2 border border-green-500 rounded-full">
+                                            <p className="text-lg font-bold text-green-500">Bayar</p>
+                                        </Link>
                                     </div>
                                 );
                             }):
@@ -208,15 +206,16 @@ export default function PenyewaDashboard({
                             </button>
                         </div> */}
                     </div>
-                    <div className="bg-white mt-5 shadow flex flex-col gap-2">
+                    <div className="bg-white mt-5 border border-gray-200 flex flex-col gap-2">
                         <button className="flex items-center p-5 w-full">
                             <FontAwesomeIcon icon={faMoneyBill} className="text-4xl w-20"/>
                             <p className="text-lg font-bold">Daftar tagihan</p>
                         </button>
-                        <button className="flex items-center p-5 w-full">
+                        <span className="w-[90%] mx-auto border-b border-gray-200"></span>
+                        <Link href={route('penyewa.riwayatTransaksi')} className="flex items-center p-5 w-full">
                             <FontAwesomeIcon icon={faClipboard} className="text-4xl w-20"/>
                             <p className="text-lg font-bold">Riwayat transaksi</p>
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

@@ -9,11 +9,12 @@ use Illuminate\Support\Facades\Log;
 use App\Models\DetailSewa;
 use App\Models\Penyewa;
 use PhpParser\JsonDecoder;
+use App\Models\Tagihan;
 
 class TransactionController extends Controller
 {
     // Harusnya jangan bikin data transaksi dulu di database
-    public function checkOut(Request $request)
+    public function checkOutDeprecated(Request $request)
     {
         try {
 
@@ -79,6 +80,103 @@ class TransactionController extends Controller
         }
     }
 
+    public function paymentWithSnap(Request $request)
+    {
+        try {
+
+            // Cari transaksi yang status pembayaran nya 5 (Belum dibayar). jika ada, response error.
+            $transaction = Transaksi::where('StatusPembayaran', 5)
+                ->where('idTagihan', $request->idTagihan)
+                ->first();
+            $Tagihan = Tagihan::where('id', $request->idTagihan)->first();
+            if ($transaction) {
+                return response()->json(['error' => 'Selesaikan transaksi terlebih dahulu (Id transaksi: ' . $transaction->id . ', total: Rp. ' . $transaction->TotalBayar . ')'], 400);
+            }
+
+            if ($request->TotalBayar < config('helper.minimal_pembayaran') && !($Tagihan->JumlahTagihan < config('helper.minimal_pembayaran'))){
+                return response()->json(['error' => 'Total Bayar minimal Rp. ' . config('helper.minimal_pembayaran')], 400);
+            }
+
+            if ($request->TotalBayar > $Tagihan->JumlahTagihan) {
+                return response()->json(['error' => 'Total Bayar melebihi tunggakan'], 400);
+            } elseif ($request->TotalBayar == 0) {
+                return response()->json(['error' => 'Total Bayar tidak boleh 0'], 400);
+            }
+
+            // Sementara matikan cek minimal bayar
+            // if ($request->TotalBayar < config('helper.minimal_pembayaran') && !(auth()->user()->Tunggakan < config('helper.minimal_pembayaran'))){
+            //     return response()->json(['error' => 'Total Bayar minimal Rp. ' . config('helper.minimal_pembayaran')], 400);
+            // }
+
+            // if ($request->TotalBayar > auth()->user()->tunggakan) {
+            //     return response()->json(['error' => 'Total Bayar melebihi tunggakan'], 400);
+            // } elseif ($request->TotalBayar == 0) {
+            //     return response()->json(['error' => 'Total Bayar tidak boleh 0'], 400);
+            // }
+
+
+            $idPenyewa = auth()->user()->id;
+            $tanggal = date('Ymd');
+            $jam = date('His');
+            $idTransaksi = $idPenyewa . $tanggal . $jam;
+            $Transaksi = new Transaksi();
+            $Transaksi->id = $idTransaksi;
+            $Transaksi->idPenyewa = auth()->user()->id;
+            $Transaksi->idTagihan = $request->idTagihan;
+            $Transaksi->TanggalBayar = date('Y-m-d H:i:s');
+            $Transaksi->TotalBayar = $request->TotalBayar;
+            $Transaksi->StatusPembayaran = 5;
+
+            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            \Midtrans\Config::$isProduction = false;
+            \Midtrans\Config::$isSanitized = true;
+            \Midtrans\Config::$is3ds = true;
+
+            $params = array(
+                'transaction_details' => array(
+                    'order_id' => $Transaksi->id,
+                    'gross_amount' => $Transaksi->TotalBayar,
+                ),
+                'customer_details' => array(
+                    'first_name' => auth()->user()->nama,
+                    'email' => auth()->user()->email
+                ),
+            );
+
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+            $Transaksi->snapToken = $snapToken;
+            $Transaksi->save();
+
+            return response()->json(['snapToken' => $snapToken], 200);
+        } catch (\Exception $e) {
+            // Log the error message
+            Log::error('Error generating snap token: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+
+            return response()->json(['error' => 'Failed to generate snap token'], 500);
+        }
+    }
+
+    public function getPendingTransaction($idTagihan)
+    {
+        $Transaksi = Transaksi::where('idTagihan', $idTagihan)->where('StatusPembayaran', 5)->first();
+        if ($Transaksi) {
+            return response()->json(['Transaksi' => $Transaksi], 200);
+        }
+        return response()->json(['error' => 'Transaction not found'], 404);
+    }
+
+    public function cancelPendingTransaction($idTransaksi)
+    {
+        $Transaksi = Transaksi::where('id', $idTransaksi)->first();
+        if ($Transaksi) {
+            $Transaksi->update(['StatusPembayaran' => 3]);
+            return response()->json(['Transaksi' => $Transaksi], 200);
+        }
+        return response()->json(['error' => 'Transaction not found'], 404);
+    }
+
     public function midtransCallback(Request $request)
     {
         $serverKey = config('midtrans.server_key');
@@ -99,6 +197,15 @@ class TransactionController extends Controller
                 case 'capture': {
                         $Transaksi->update(['StatusPembayaran' => 1]);
                         Log::info('Payment captured successfully for Order ID: ' . $request->order_id);
+
+                        // Update nilai tagihan
+                        $Tagihan = Tagihan::where('id', $Transaksi->idTagihan)->first();
+                        // Kurangi jumlah tagihan sesuai dengan total bayar transaksi dan jika sudah 0 ubah status tagihan menjadi 1
+
+                        $Tagihan->update(['JumlahTagihan' => $Tagihan->JumlahTagihan - $Transaksi->TotalBayar]);
+                        if ($Tagihan->JumlahTagihan == 0) {
+                            $Tagihan->update(['StatusTagihan' => 1]);
+                        }
                     }
                     break;
                 case 'settlement':
@@ -200,7 +307,7 @@ class TransactionController extends Controller
 
 
     // Perlu di optimisasi lagi, soal nya ini dia ngerequest setiap user refresh
-    public function getTransactionsByIdPenyewa(Request $request)
+    public function getTransactionsByIdPenyewaDeprecated(Request $request)
     {
         // $AuthString = 'Basic ' . base64_encode(config('midtrans.server_key') . ':');
         // Log::info("Auth string: " . $AuthString);
@@ -232,6 +339,13 @@ class TransactionController extends Controller
 
         // }
         return response()->json($transactions);
+    }
+
+    public function getTransactionByIdPenyewa($idPenyewa)
+    {
+
+        $Transaksi = Transaksi::where('idPenyewa', $idPenyewa)->get();
+        return response()->json($Transaksi, 200);
     }
 
     public function getAllTransaction(Request $request)

@@ -115,8 +115,8 @@ export default function PenyewaHeader({ children , auth}) {
         <>
             <Head title="Home" />
             <Navbar className={"z-10"}>
-                <button onClick={toggleNotifications} className="relative text-gray-500 font-sans font-extrabold origin-center max-md:text-slate-500 max-md:p-2 me-5">
-                    <FontAwesomeIcon className='scale-150 transition-all ease-in-out duration-75 active:scale-125' icon={faBell} />
+                <button onClick={toggleNotifications} className="relative text-gray-500 font-sans font-extrabold origin-center max-md:text-slate-500 max-md:p-2 me-5 group">
+                    <FontAwesomeIcon className='scale-150 transition-all ease-in-out duration-75 group-active:scale-125' icon={faBell} />
                     {notificationData.data && notificationData.data.filter(item => item.status === 0).length > 0 && (
                         <span className="absolute sm:top-2 top-3 sm:left-2 left-[50%] bg-red-500 text-white font-bold rounded-full w-6 h-6 flex items-center justify-center">
                             {notificationData.data.filter(item => item.status === 0).length}
@@ -152,7 +152,7 @@ export default function PenyewaHeader({ children , auth}) {
 
 
 
-                <Link className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
+                <Link href={route('penyewa.dashboard')} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2">
                     Dashboard
                 </Link>
                 <button onClick={toggleProfileDropdown} className="text-gray-500 hover:text-[#FFBF69] font-sans font-extrabold max-md:text-slate-500 max-md:p-2 max-md:hidden" id="menu-button" aria-expanded={profileDropdownOpen} aria-haspopup="true">

@@ -12,7 +12,7 @@ export default function Navbar({children, className, Admin = false})
 
     return(
         <>
-            <div className={"flex fixed justify-between p-4 w-[100%] shadow-md bg-white " + className}>
+            <div className={"flex fixed justify-between p-4 w-[100%] border border-gray-200 bg-white " + className}>
                 <div className="nav-logo">
                     <div className="relative flex-col">
                         <div className="text-gray-500 font-extrabold text-2xl">

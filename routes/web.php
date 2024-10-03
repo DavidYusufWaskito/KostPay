@@ -94,7 +94,9 @@ Route::group(['middleware' => ['auth:admin']],function(){
 
 Route::group(['middleware' => ['auth:web']],function(){
     Route::get('/penyewa',[PenyewaDashboardController::class,'index'])->name('penyewa.dashboard');
-    Route::post('/penyewa/bayar',[TransactionController::class,'checkOut'])->name('penyewa.bayar');
+    Route::get('/penyewa/bayar/{idTagihan}',[PenyewaDashboardController::class,'v_pembayaran'])->name('penyewa.detailbayar');
+    Route::get('/penyewa/transaksi',[PenyewaDashboardController::class,'v_riwayatTransaksi'])->name('penyewa.riwayatTransaksi');
+    // Route::post('/penyewa/bayar',[TransactionController::class,'checkOut'])->name('penyewa.bayar');
     Route::post('/penyewa/transactions',[TransactionController::class,'getTransactionsByIdPenyewa'])->name('penyewa.transactions');
     Route::post('/penyewa/tagihan/get/detailSewa',[TagihanController::class,'getTagihanByDetailSewaId']);
 });

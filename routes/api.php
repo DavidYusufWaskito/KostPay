@@ -32,8 +32,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/tagihan/detail-sewa/{id}', [TagihanController::class, 'getTagihanByDetailSewaId']);
     // Resource Pembayaran Penyewa (Tenant Payments)
     Route::post('/penyewa/bayar', [TransactionController::class, 'checkOut'])->name('penyewa.bayar'); // Pembayaran penyewa
-    Route::get('/penyewa/{id}/transaksi', [TransactionController::class, 'getTransactionsByIdPenyewa'])->name('penyewa.transactions'); // Mendapatkan transaksi berdasarkan ID penyewa
-    Route::get('/penyewa/{id}/tagihan', [TagihanController::class, 'getTagihanByDetailSewaId'])->name('penyewa.tagihan'); // Mendapatkan tagihan berdasarkan detail sewa
+    Route::get('/penyewa/{idPenyewa}/transaksi', [TransactionController::class, 'getTransactionsByIdPenyewa'])->name('penyewa.transactions'); // Mendapatkan transaksi berdasarkan ID penyewa
+    Route::get('/penyewa/{idPenyewa}/tagihan', [TagihanController::class, 'getTagihanByDetailSewaId'])->name('penyewa.tagihan'); // Mendapatkan tagihan berdasarkan detail sewa
 
     // Resource Notifikasi (Notifications)
     Route::get('/notifikasi/{id}', [NotificationController::class, 'getNotifByPenyewa'])->name('notifikasi.index'); // Mendapatkan notifikasi berdasarkan ID penyewa
@@ -42,7 +42,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Resource Transaksi dengan Snap Token
     Route::put('/transaksi/snap/{snap_token}', [TransactionController::class, 'updateTransactionStatusBySnapToken'])->name('transaksi.update-status-snap'); // Mengubah status transaksi dengan Snap Token
+    Route::post('/transaksi/payment/snap', [TransactionController::class, 'paymentWithSnap'])->name('transaksi.payment.snap');
+    Route::get('/transaksi/pending/{idTagihan}', [TransactionController::class, 'getPendingTransaction'])->name('transaksi.pending');
+    Route::put('/transaksi/pending/cancel/{idTransaksi}', [TransactionController::class, 'cancelPendingTransaction'])->name('transaksi.pending.cancel');
+});
 
+Route::group(['middleware' => ['auth:sanctum','penyewa-auth-id']], function () {
+    Route::get('/transaksi/penyewa/{idPenyewa}', [TransactionController::class, 'getTransactionByIdPenyewa'])->name('transaksi.index');
 });
 
 Route::group(['middleware' => ['auth:sanctum', 'verify-auth:admin']], function () {
