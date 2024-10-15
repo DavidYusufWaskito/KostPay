@@ -17,6 +17,7 @@ class PenyewaDashboardController extends Controller
         $Penyewa = auth()->user();
         
         $DetailSewa = DetailSewa::where('idPenyewa', $Penyewa->id)->first();
+        $Tagihan = Tagihan::where('idDetailSewa', $DetailSewa->id)->where('StatusTagihan', 0)->get();
 
         if (!$DetailSewa || $DetailSewa->StatusAktif == 0) {
             return Inertia::render('Penyewa/belumSewa');
@@ -27,9 +28,10 @@ class PenyewaDashboardController extends Controller
         // $DetailSewa->load('Kamar');
 
         // return response()->json($DetailSewa->Kamar);
+
         
 
-        return Inertia::render('Penyewa/dashboard',['DetailSewa' => $DetailSewa,'Kamar' => $DetailSewa->Kamar,'MIDTRANS_CLIENT_KEY' => config('midtrans.client_key'),'minimal_pembayaran' => config('helper.minimal_pembayaran')]);
+        return Inertia::render('Penyewa/dashboard',['DetailSewa' => $DetailSewa,'Kamar' => $DetailSewa->Kamar,'MIDTRANS_CLIENT_KEY' => config('midtrans.client_key'),'minimal_pembayaran' => config('helper.minimal_pembayaran'),'Tagihan' => $Tagihan]);
     }
 
     public function v_pembayaran($idTagihan)
@@ -44,5 +46,12 @@ class PenyewaDashboardController extends Controller
     {
         $Transaksi = Transaksi::where('idPenyewa', auth()->user()->id)->get();
         return Inertia::render('Penyewa/Pembayaran/RiwayatTransaksi',['Transaksi' => $Transaksi]);
+    }
+
+    public function v_daftarTagihan(Request $request)
+    {
+        $DetailSewa = DetailSewa::where('idPenyewa', auth()->user()->id)->first();
+        $Tagihan = Tagihan::where('idDetailSewa', $DetailSewa->id)->where('StatusTagihan', 0)->get();
+        return Inertia::render('Penyewa/Pembayaran/DaftarTagihan',['Tagihan' => $Tagihan,'DetailSewa' => $DetailSewa]);
     }
 }

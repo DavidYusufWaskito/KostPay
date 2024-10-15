@@ -1,4 +1,5 @@
 import PenyewaHeader from "@/Layouts/Penyewa/PenyewaHeader";
+import PenyewaFooter from "@/Layouts/Penyewa/PenyewaFooter";
 import { useState,useEffect } from "react";
 import { useMidtrans } from "@/Components/useMidtrans";
 import NumberInput from "@/Components/NumberInput";
@@ -115,7 +116,7 @@ export default function Pembayaran({auth,Tagihan,MIDTRANS_CLIENT_KEY,minimal_pem
     };
 
     const getPendingTransaction = async () => {
-        axios.get("/api/transaksi/pending/"+Tagihan.id)
+        axios.get("/api/transaksi/pending/penyewa/"+auth.user.id)
             .then((response) => {
                 console.log(response.data);
                 setPendingTransaction(response.data);
@@ -147,6 +148,7 @@ export default function Pembayaran({auth,Tagihan,MIDTRANS_CLIENT_KEY,minimal_pem
     return (
         <div className="overflow-y-auto h-full">
             <PenyewaHeader auth={auth} />
+            <PenyewaFooter auth={auth} />
             <Snackbar open={openSnackbar.open} onClose={() => setOpenSnackbar({open: false})} autoHideDuration={3000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} >
                 <SnackbarContent style={{backgroundColor: openSnackbar.severity === 'success' ? 'green' : 'red'}} message={openSnackbar.message} />
             </Snackbar>

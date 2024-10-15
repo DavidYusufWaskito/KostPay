@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::group(['middleware' => ['auth:sanctum','penyewa-auth-id']], function () {
     Route::get('/transaksi/penyewa/{idPenyewa}', [TransactionController::class, 'getTransactionByIdPenyewa'])->name('transaksi.index');
+    Route::get('/transaksi/pending/penyewa/{idPenyewa}', [TransactionController::class, 'getPendingTransactionByIdPenyewa'])->name('transaksi.pending.penyewa.index');
 });
 
 Route::group(['middleware' => ['auth:sanctum', 'verify-auth:admin']], function () {
@@ -77,6 +78,9 @@ Route::group(['middleware' => ['auth:sanctum', 'verify-auth:admin']], function (
 
     // Mengirim notifikasi (Admin)
     Route::post('/admin/notifikasi', [NotificationController::class, 'sendNotif'])->name('admin.notifikasi.send'); // Admin mengirim notifikasi
+
+    // Tagihan (Admin)
+    Route::post('/admin/tagihan/monthly/detail-sewa/{idDetailSewa}', [TagihanController::class, 'addTagihanNextMonthByDetailSewaId'])->name('admin.tagihan.detailsewa.monthly.add'); // Admin membuat tagihan berdasarkan detail sewa
 });
 
 Route::post('login', [AuthenticatedSessionController::class, 'store']);

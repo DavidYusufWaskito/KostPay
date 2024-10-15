@@ -1,6 +1,7 @@
 import { useState,useEffect } from "react";
 import { useMidtrans } from "@/Components/useMidtrans";
 import PenyewaHeader from "@/Layouts/Penyewa/PenyewaHeader";
+import PenyewaFooter from "@/Layouts/Penyewa/PenyewaFooter";
 import { Snackbar,SnackbarContent } from "@mui/material";
 export default function RiwayatTransaksi({auth,Tagihan,MIDTRANS_CLIENT_KEY,Transaksi}) {
 
@@ -75,6 +76,7 @@ export default function RiwayatTransaksi({auth,Tagihan,MIDTRANS_CLIENT_KEY,Trans
     return (
         <div className="overflow-y-auto h-full">
             <PenyewaHeader auth={auth} />
+            <PenyewaFooter auth={auth} prevRoute={route('penyewa.dashboard')} />
             <Snackbar open={openSnackbar.open} onClose={() => setOpenSnackbar({open: false})} autoHideDuration={6000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} >
                 <SnackbarContent style={{backgroundColor: openSnackbar.severity === 'success' ? 'green' : 'red'}} message={openSnackbar.message} />
             </Snackbar>

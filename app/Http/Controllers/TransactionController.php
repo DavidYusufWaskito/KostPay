@@ -167,6 +167,15 @@ class TransactionController extends Controller
         return response()->json(['error' => 'Transaction not found'], 404);
     }
 
+    public function getPendingTransactionByIdPenyewa($idPenyewa)
+    {
+        $Transaksi = Transaksi::where('idPenyewa', $idPenyewa)->where('StatusPembayaran', 5)->first();
+        if ($Transaksi) {
+            return response()->json(['Transaksi' => $Transaksi], 200);
+        }
+        return response()->json(['error' => 'Transaction not found'], 404);
+    }
+
     public function cancelPendingTransaction($idTransaksi)
     {
         $Transaksi = Transaksi::where('id', $idTransaksi)->first();
@@ -351,7 +360,7 @@ class TransactionController extends Controller
     public function getAllTransaction(Request $request)
     {
         $transaction = Transaksi::all();
-        Log::info('Page requesting all transaction)');
+        Log::info('Page requesting all transaction');
         return response()->json($transaction);
     }
 

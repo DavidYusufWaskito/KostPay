@@ -1,6 +1,7 @@
 import { Head, Link } from "@inertiajs/react";
 import { useEffect, useState} from "react";
 import PenyewaHeader from "@/Layouts/Penyewa/PenyewaHeader";
+import PenyewaFooter from "@/Layouts/Penyewa/PenyewaFooter";
 import DataTable from "react-data-table-component";
 import CustomPaginationComponent from "@/Components/DatatableComponent/CustomPagination";
 import Modal from "@/Components/Modal";
@@ -18,9 +19,10 @@ export default function PenyewaDashboard({
     Kamar,
     MIDTRANS_CLIENT_KEY,
     minimal_pembayaran,
+    Tagihan
 }) {
     const [TransactionData, setTransactionData] = useState([]);
-    const [TagihanData, setTagihanData] = useState([]);
+    const [TagihanData, setTagihanData] = useState(Tagihan);
     const [showBayarModal, setShowBayarModal] = useState(false);
     const [openSnackbar, setOpenSnackbar] = useState({
         open: false,
@@ -34,10 +36,10 @@ export default function PenyewaDashboard({
     });
 
     // Fetching transaction data
-    useEffect(() => {
-        // getTransactions();
-        getTagihan();
-    }, []);
+    // useEffect(() => {
+    //     // getTransactions();
+    //     getTagihan();
+    // }, []);
 
     // Pakai midtrans
     useMidtrans(MIDTRANS_CLIENT_KEY);
@@ -151,7 +153,7 @@ export default function PenyewaDashboard({
     };
 
     const getTagihan = () => {
-        axios.get("api/tagihan/detail-sewa/" + DetailSewa.id).then((response) => {
+        axios.get("/api/tagihan/detail-sewa/" + DetailSewa.id).then((response) => {
             setTagihanData((e) => {
                 return response.data;
             });
@@ -167,6 +169,8 @@ export default function PenyewaDashboard({
     return (
         <div className="overflow-y-auto h-full">
             <PenyewaHeader auth={auth}/>
+            <PenyewaFooter auth={auth} prevRoute={route('penyewa.dashboard')}/>
+
 
                         {/* Snackbar notifikasi */}
             <Snackbar open={openSnackbar.open} onClose={() => setOpenSnackbar({open: false})} autoHideDuration={6000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} >
@@ -175,42 +179,40 @@ export default function PenyewaDashboard({
 
             <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white rounded border border-gray-200 p-10">
+                    <div className="bg-white rounded rounded-b-none border border-b-0 border-gray-200 p-10">
                     {
-                        TagihanData.length > 0 ?
-                            TagihanData.map((data, index) => {
-                                return (
-                                    <div key={index} className="flex justify-between items-center">
-                                        <div>
-                                            <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(data.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
-                                            <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(data.JumlahTagihan)}</p>
-                                        </div>
-                                        {/* <button onClick={handleBayarClick} className="h-fit px-5 py-2 border border-green-500 rounded-full">
-                                            <p className="text-lg font-bold text-green-500">Bayar</p>
-                                        </button> */}
-                                        <Link href={route('penyewa.detailbayar', {idTagihan: data.id})} className="h-fit px-5 py-2 border border-green-500 rounded-full">
-                                            <p className="text-lg font-bold text-green-500">Bayar</p>
-                                        </Link>
-                                    </div>
-                                );
-                            }):
-                            <p className="text-center text-2xl font-bold">Hore tidak ada tagihan</p>
-                    }
-                        {/* <div className="flex justify-between items-center">
-                            <div>
-                                <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(DetailSewa.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
-                                <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(auth.user.tunggakan)}</p>
+                        TagihanData.length > 0 ? (
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(TagihanData[TagihanData.length - 1].TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
+                                    <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(TagihanData[TagihanData.length - 1].JumlahTagihan)}</p>
+                                </div>
+                                <Link href={route('penyewa.detailbayar', {idTagihan: TagihanData[TagihanData.length - 1].id})} className="h-fit px-5 py-2 border border-green-500 rounded-full">
+                                    <p className="text-lg font-bold text-green-500">Bayar</p>
+                                </Link>
                             </div>
-                            <button className="h-fit px-5 py-2 border border-green-500 rounded-full">
-                                <p className="text-lg font-bold text-green-500">Bayar</p>
-                            </button>
-                        </div> */}
+                        ):
+                            // TagihanData.map((data, index) => {
+                            //     return (
+                            //         <div key={index} className="flex justify-between items-center">
+                            //             <div>
+                            //                 <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(data.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
+                            //                 <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(data.JumlahTagihan)}</p>
+                            //             </div>
+                            //             <Link href={route('penyewa.detailbayar', {idTagihan: data.id})} className="h-fit px-5 py-2 border border-green-500 rounded-full">
+                            //                 <p className="text-lg font-bold text-green-500">Bayar</p>
+                            //             </Link>
+                            //         </div>
+                            //     );
+                            // }):
+                            <p className="text-center text-2xl font-bold text-gray-500">Hore tidak ada tagihan</p>
+                    }
                     </div>
-                    <div className="bg-white mt-5 border border-gray-200 flex flex-col gap-2">
-                        <button className="flex items-center p-5 w-full">
+                    <div className="bg-white border border-gray-200 flex flex-col gap-2">
+                        <Link href={route('penyewa.daftartagihan')} className="flex items-center p-5 w-full">
                             <FontAwesomeIcon icon={faMoneyBill} className="text-4xl w-20"/>
                             <p className="text-lg font-bold">Daftar tagihan</p>
-                        </button>
+                        </Link>
                         <span className="w-[90%] mx-auto border-b border-gray-200"></span>
                         <Link href={route('penyewa.riwayatTransaksi')} className="flex items-center p-5 w-full">
                             <FontAwesomeIcon icon={faClipboard} className="text-4xl w-20"/>

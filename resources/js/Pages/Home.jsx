@@ -6,13 +6,20 @@ import { faWifi, faShower, faBed } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Footer from "@/Layouts/Footer";
 
-export default function Home({ auth, kosImage }) {
+export default function Home({ auth, kosImage , kosImageSmall}) {
     const scrollRef = useRef(null);
     const footerRef = useRef(null);
     console.log(kosImage);
     window.Echo.channel('messagechannel.').listen('MessageEvent', (e) => {
         console.log(e);
     })
+
+    const onImgLoaded = (e) => {
+        let imgElement = e.currentTarget;
+        console.log('image loaded');
+
+        imgElement.classList.remove('hidden');
+    }
 
     return (
         <div className="overflow-y-auto h-full">
@@ -49,8 +56,12 @@ export default function Home({ auth, kosImage }) {
                     <div className="h-[600px]">
                         <div className="h-full w-full">
                             {/* <img className="h-full w-full object-cover" src={kosImage} alt="Kost 1" /> */}
-                            <section style={{ backgroundImage: `url(${kosImage})` }} className={`h-full w-full flex justify-center bg-cover bg-center bg-no-repeat bg-gray-600 bg-blend-multiply`}>
-                                <div className="text-center p-4">
+                            <section id="blur-load" style={{ backgroundImage: `url(${kosImageSmall})` }} className={`relative h-full w-full flex justify-center bg-cover bg-center bg-no-repeat bg-gray-600 bg-blend-multiply`}>
+                                <div className="inset-0 bg-black opacity-50 absolute h-full w-full">
+                                    <img src={kosImage} onLoad={onImgLoaded} alt="Kost 1" className="h-full w-full object-cover object-center hidden" />
+                                </div>
+
+                                <div className="text-center z-[5] p-4">
                                     <p className="lg:text-5xl sm:text-2xl mt-10 font-bold text-white">
                                         Selamat datang di kost Bu Yati
                                     </p>

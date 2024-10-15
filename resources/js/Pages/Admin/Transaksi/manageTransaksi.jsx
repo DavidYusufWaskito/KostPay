@@ -126,14 +126,14 @@ export default function manageTransaksi({ auth }) {
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
 
-                        <div className="bg-white rounded shadow p-4">
+                        <div className="bg-white rounded border border-gray-200 p-4">
                             <div className="flex items-center justify-between mb-4">
                                 <h1 className="text-2xl font-semibold text-gray-900">Manage Transaksi</h1>
                                 <p className="text-sm text-gray-600">Selamat datang {' ' + auth.user.nama}</p>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded shadow p-4 mt-4">
+                        <div className="bg-white rounded border border-gray-200 p-4 mt-4">
                             <div className="flex items-center justify-between">
                                 <input
                                     type="text"

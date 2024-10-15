@@ -8,7 +8,7 @@ export default ({ status }) => {
         '5': 'bg-blue-100 text-blue-800',
     };
     return (
-        <span className={`inline-flex items-center justify-center py-2 w-1/3 rounded-xl text-xs font-medium leading-5 ${colors[status] || ''}`}>
+        <span className={`inline-flex items-center justify-center py-2 min-w-20 w-1/3 rounded-xl text-xs font-medium leading-5 ${colors[status] || ''}`}>
             {['Gagal', 'Sukses', 'Pending', 'Dibatalkan','Expired','Belum Bayar'][status] || ''}
         </span>
     );

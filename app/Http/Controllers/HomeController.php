@@ -10,8 +10,9 @@ class HomeController extends Controller
     //
     public function index(Request $request)
     {
+        $kosImageSmall = asset('/storage/img/kos_front-small.webp');
         $kosImage = asset('/storage/img/kos_front.webp');
-        return Inertia::render('Home', ['kosImage' => $kosImage]);
+        return Inertia::render('Home', ['kosImageSmall' => $kosImageSmall, 'kosImage' => $kosImage]);
     }
 
     public function v_daftar(Request $request)
