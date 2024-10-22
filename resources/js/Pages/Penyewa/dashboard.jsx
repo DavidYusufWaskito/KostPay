@@ -2,6 +2,7 @@ import { Head, Link } from "@inertiajs/react";
 import { useEffect, useState} from "react";
 import PenyewaHeader from "@/Layouts/Penyewa/PenyewaHeader";
 import PenyewaFooter from "@/Layouts/Penyewa/PenyewaFooter";
+import PenyewaPage from "@/Layouts/Penyewa/PenyewaPage";
 import DataTable from "react-data-table-component";
 import CustomPaginationComponent from "@/Components/DatatableComponent/CustomPagination";
 import Modal from "@/Components/Modal";
@@ -167,60 +168,49 @@ export default function PenyewaDashboard({
     };
 
     return (
-        <div className="overflow-y-auto h-full">
-            <PenyewaHeader auth={auth}/>
-            <PenyewaFooter auth={auth} prevRoute={route('penyewa.dashboard')}/>
-
-
-                        {/* Snackbar notifikasi */}
-            <Snackbar open={openSnackbar.open} onClose={() => setOpenSnackbar({open: false})} autoHideDuration={6000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} >
-                <SnackbarContent style={{backgroundColor: openSnackbar.severity === 'success' ? 'green' : 'red'}} message={openSnackbar.message} />
-            </Snackbar>
-
-            <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white rounded rounded-b-none border border-b-0 border-gray-200 p-10">
-                    {
-                        TagihanData.length > 0 ? (
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(TagihanData[TagihanData.length - 1].TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
-                                    <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(TagihanData[TagihanData.length - 1].JumlahTagihan)}</p>
-                                </div>
-                                <Link href={route('penyewa.detailbayar', {idTagihan: TagihanData[TagihanData.length - 1].id})} className="h-fit px-5 py-2 border border-green-500 rounded-full">
-                                    <p className="text-lg font-bold text-green-500">Bayar</p>
-                                </Link>
+        <>
+            <PenyewaPage auth={auth} snackbarStates={openSnackbar} setSnackbarStates={setOpenSnackbar} prevRoute={route('penyewa.dashboard')}>
+                <div className="bg-white rounded rounded-b-none border border-b-0 border-gray-200 p-10">
+                {
+                    TagihanData.length > 0 ? (
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(TagihanData[TagihanData.length - 1].TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
+                                <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(TagihanData[TagihanData.length - 1].JumlahTagihan)}</p>
                             </div>
-                        ):
-                            // TagihanData.map((data, index) => {
-                            //     return (
-                            //         <div key={index} className="flex justify-between items-center">
-                            //             <div>
-                            //                 <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(data.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
-                            //                 <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(data.JumlahTagihan)}</p>
-                            //             </div>
-                            //             <Link href={route('penyewa.detailbayar', {idTagihan: data.id})} className="h-fit px-5 py-2 border border-green-500 rounded-full">
-                            //                 <p className="text-lg font-bold text-green-500">Bayar</p>
-                            //             </Link>
-                            //         </div>
-                            //     );
-                            // }):
-                            <p className="text-center text-2xl font-bold text-gray-500">Hore tidak ada tagihan</p>
-                    }
-                    </div>
-                    <div className="bg-white border border-gray-200 flex flex-col gap-2">
-                        <Link href={route('penyewa.daftartagihan')} className="flex items-center p-5 w-full">
-                            <FontAwesomeIcon icon={faMoneyBill} className="text-4xl w-20"/>
-                            <p className="text-lg font-bold">Daftar tagihan</p>
-                        </Link>
-                        <span className="w-[90%] mx-auto border-b border-gray-200"></span>
-                        <Link href={route('penyewa.riwayatTransaksi')} className="flex items-center p-5 w-full">
-                            <FontAwesomeIcon icon={faClipboard} className="text-4xl w-20"/>
-                            <p className="text-lg font-bold">Riwayat transaksi</p>
-                        </Link>
-                    </div>
+                            <Link href={route('penyewa.detailbayar', {idTagihan: TagihanData[TagihanData.length - 1].id})} className="h-fit px-5 py-2 border border-green-500 rounded-full">
+                                <p className="text-lg font-bold text-green-500">Bayar</p>
+                            </Link>
+                        </div>
+                    ):
+                        // TagihanData.map((data, index) => {
+                        //     return (
+                        //         <div key={index} className="flex justify-between items-center">
+                        //             <div>
+                        //                 <p className="text-sm text-gray-500">Tagihan jatuh tempo pada {new Date(data.TanggalJatuhTempo).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}</p>
+                        //                 <p className="text-3xl font-bold mt-2">Rp{new Intl.NumberFormat('id-ID').format(data.JumlahTagihan)}</p>
+                        //             </div>
+                        //             <Link href={route('penyewa.detailbayar', {idTagihan: data.id})} className="h-fit px-5 py-2 border border-green-500 rounded-full">
+                        //                 <p className="text-lg font-bold text-green-500">Bayar</p>
+                        //             </Link>
+                        //         </div>
+                        //     );
+                        // }):
+                        <p className="text-center text-2xl font-bold text-gray-500">Hore tidak ada tagihan</p>
+                }
                 </div>
-            </div>
-        </div>
+                <div className="bg-white border border-gray-200 flex flex-col gap-2">
+                    <Link href={route('penyewa.daftartagihan')} className="flex items-center p-5 w-full">
+                        <FontAwesomeIcon icon={faMoneyBill} className="text-4xl w-20"/>
+                        <p className="text-lg font-bold">Daftar tagihan</p>
+                    </Link>
+                    <span className="w-[90%] mx-auto border-b border-gray-200"></span>
+                    <Link href={route('penyewa.riwayatTransaksi')} className="flex items-center p-5 w-full">
+                        <FontAwesomeIcon icon={faClipboard} className="text-4xl w-20"/>
+                        <p className="text-lg font-bold">Riwayat transaksi</p>
+                    </Link>
+                </div>
+            </PenyewaPage>
+        </>
     );
 }

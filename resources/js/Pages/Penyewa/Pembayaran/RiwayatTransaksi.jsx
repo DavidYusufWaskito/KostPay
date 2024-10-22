@@ -1,7 +1,6 @@
 import { useState,useEffect } from "react";
 import { useMidtrans } from "@/Components/useMidtrans";
-import PenyewaHeader from "@/Layouts/Penyewa/PenyewaHeader";
-import PenyewaFooter from "@/Layouts/Penyewa/PenyewaFooter";
+import PenyewaPage from "@/Layouts/Penyewa/PenyewaPage";
 import { Snackbar,SnackbarContent } from "@mui/material";
 export default function RiwayatTransaksi({auth,Tagihan,MIDTRANS_CLIENT_KEY,Transaksi}) {
 
@@ -74,48 +73,41 @@ export default function RiwayatTransaksi({auth,Tagihan,MIDTRANS_CLIENT_KEY,Trans
     }
 
     return (
-        <div className="overflow-y-auto h-full">
-            <PenyewaHeader auth={auth} />
-            <PenyewaFooter auth={auth} prevRoute={route('penyewa.dashboard')} />
-            <Snackbar open={openSnackbar.open} onClose={() => setOpenSnackbar({open: false})} autoHideDuration={6000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} >
-                <SnackbarContent style={{backgroundColor: openSnackbar.severity === 'success' ? 'green' : 'red'}} message={openSnackbar.message} />
-            </Snackbar>
-            <div className="pt-[6rem] pb-[2rem] bg-white overflow-y-auto">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white rounded border border-gray-200 p-4">
-                        <div className="flex flex-col">
-                        {
-                            Object.keys(groupedTransactions).length > 0 ? (
-                                Object.keys(groupedTransactions).sort(sortMonthYear).map((monthYear, index) => {
-                                    // Filter transaksi berdasarkan StatusPembayaran == 1
-                                    const filteredTransactions = groupedTransactions[monthYear].filter(data => data.StatusPembayaran == 1).sort((a, b) => new Date(b.TanggalBayar) - new Date(a.TanggalBayar)); // Urutkan secara descending berdasarkan TanggalBayar;
-                                    return filteredTransactions.length > 0 ? (
-                                        <div className="flex flex-col" key={index}>
-                                            <div className="w-full font-bold text-lg">{monthYear}</div>
-                                            <div className="w-full">
-                                                {filteredTransactions.map((data, idx) => (
-                                                    <div className="flex justify-between odd:bg-gray-100 pl-4" key={idx}>
-                                                        <p>Pembayaran tagihan kost</p>
-                                                        <div className="flex flex-col gap-2">
-                                                            <p className="font-bold text-green-600 text-end">Rp{new Intl.NumberFormat('id-ID').format(data.TotalBayar)}</p>
-                                                            <div>{new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(data.TanggalBayar))}</div>
-                                                        </div>
+        <>
+            <PenyewaPage auth={auth} snackbarStates={openSnackbar} setSnackbarStates={setOpenSnackbar} prevRoute={route('penyewa.dashboard')}>
+                <div className="bg-white rounded border border-gray-200 p-4">
+                    <div className="flex flex-col">
+                    {
+                        Object.keys(groupedTransactions).length > 0 ? (
+                            Object.keys(groupedTransactions).sort(sortMonthYear).map((monthYear, index) => {
+                                // Filter transaksi berdasarkan StatusPembayaran == 1
+                                const filteredTransactions = groupedTransactions[monthYear].filter(data => data.StatusPembayaran == 1).sort((a, b) => new Date(b.TanggalBayar) - new Date(a.TanggalBayar)); // Urutkan secara descending berdasarkan TanggalBayar;
+                                return filteredTransactions.length > 0 ? (
+                                    <div className="flex flex-col" key={index}>
+                                        <div className="w-full font-bold text-lg">{monthYear}</div>
+                                        <div className="w-full">
+                                            {filteredTransactions.map((data, idx) => (
+                                                <div className="flex justify-between odd:bg-gray-100 pl-4" key={idx}>
+                                                    <p>Pembayaran tagihan kost</p>
+                                                    <div className="flex flex-col gap-2">
+                                                        <p className="font-bold text-green-600 text-end">Rp{new Intl.NumberFormat('id-ID').format(data.TotalBayar)}</p>
+                                                        <div>{new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(data.TanggalBayar))}</div>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ) : null; // Hanya tampilkan jika ada transaksi yang sesuai
-                                })
-                            ) : (
-                                <div className="w-full">
-                                    Belum ada transaksi
-                                </div>
-                            )
-                        }
-                        </div>
+                                    </div>
+                                ) : null; // Hanya tampilkan jika ada transaksi yang sesuai
+                            })
+                        ) : (
+                            <div className="w-full">
+                                Belum ada transaksi
+                            </div>
+                        )
+                    }
                     </div>
                 </div>
-            </div>
-        </div>
+            </PenyewaPage>
+        </>
     )
 }

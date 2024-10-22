@@ -92,7 +92,7 @@ Route::group(['middleware' => ['auth:admin']],function(){
 });
 
 
-Route::group(['middleware' => ['auth:web']],function(){
+Route::group(['middleware' => ['auth:web','share-notification-data']],function(){
     Route::get('/penyewa',[PenyewaDashboardController::class,'index'])->name('penyewa.dashboard');
     Route::get('/penyewa/bayar/{idTagihan}',[PenyewaDashboardController::class,'v_pembayaran'])->name('penyewa.detailbayar');
     Route::get('/penyewa/transaksi',[PenyewaDashboardController::class,'v_riwayatTransaksi'])->name('penyewa.riwayatTransaksi');

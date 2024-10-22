@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import Navbar from '../Navbar';
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,14 +6,15 @@ import { faBell } from '@fortawesome/free-solid-svg-icons';
 import Modal from '@/Components/Modal';
 
 export default function PenyewaHeader({ children , auth}) {
+    const notificationProps = usePage().props.Notifikasi;
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const [notificationsOpen,setNotificationsOpen] = useState(false);
-    const [notificationData, setNotificationData] = useState([]);
+    const [notificationData, setNotificationData] = useState(notificationProps);
     const [notifModalOpen, setNotifModalOpen] = useState({
         open: false,
         data: {}
     });
-    
+
     const toggleProfileDropdown = () => {
         setProfileDropdownOpen(!profileDropdownOpen);
     };
@@ -32,9 +33,11 @@ export default function PenyewaHeader({ children , auth}) {
         };
     }, []);
 
-    useEffect(() => {
-        fetchNotif();
-    }, [])
+    // useEffect(() => {
+    //     // fetchNotif();
+
+    //     setNotificationData(notificationProps);
+    // }, [])
 
     // toggle open notification
     const toggleNotifications = () => {
@@ -67,10 +70,10 @@ export default function PenyewaHeader({ children , auth}) {
             }
         })
         .then(response => {
-            console.log(response.data);
+            console.log(response.data.data);
             if (response.status === 200)
             {
-                setNotificationData(response.data);
+                setNotificationData(response.data.data);
                 console.log("Notification: ", notificationData);
             }
         })
@@ -117,9 +120,9 @@ export default function PenyewaHeader({ children , auth}) {
             <Navbar className={"z-10"}>
                 <button onClick={toggleNotifications} className="relative text-gray-500 font-sans font-extrabold origin-center max-md:text-slate-500 max-md:p-2 me-5 group">
                     <FontAwesomeIcon className='scale-150 transition-all ease-in-out duration-75 group-active:scale-125' icon={faBell} />
-                    {notificationData.data && notificationData.data.filter(item => item.status === 0).length > 0 && (
+                    {notificationData && notificationData.filter(item => item.status === 0).length > 0 && (
                         <span className="absolute sm:top-2 top-3 sm:left-2 left-[50%] bg-red-500 text-white font-bold rounded-full w-6 h-6 flex items-center justify-center">
-                            {notificationData.data.filter(item => item.status === 0).length}
+                            {notificationData.filter(item => item.status === 0).length}
                         </span>
                     )}
                 </button>
@@ -133,8 +136,8 @@ export default function PenyewaHeader({ children , auth}) {
                             </button>
                         </div>
                         <div className="flex flex-col h-full gap-2 mt-2 mb-2 px-2 overflow-auto" role="none">
-                            {notificationData.data.length > 0 ? (
-                                notificationData.data.map((notif) => (
+                            {notificationData.length > 0 ? (
+                                notificationData.map((notif) => (
                                     <button onClick={() => setNotifModalOpen({open: true, data: notif})} className={`flex justify-between ${notif.status === 0 ? 'bg-gray-100' : ''} ${notif.status === 0 ? '' : 'border'} rounded px-4 py-2 text-sm text-gray-700 hover:text-blue-500 transition-colors duration-300`} role="menuitem" tabIndex="-1" id="menu-item-0" key={notif.id}>
                                         <span key={notif.id} className="overflow-x-hidden whitespace-nowrap truncate">
                                             {notif.Pesan}
@@ -183,11 +186,11 @@ export default function PenyewaHeader({ children , auth}) {
                 </div>
             )}
             
-            {notificationData.data && notificationsOpen && (
+            {notificationData && notificationsOpen && (
                 <div className="fixed top-[6.5rem] right-0 z-10 mb-4 mr-4 w-full max-w-[35%] h-80 rounded-md overflow-y-auto bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-md:hidden sm:max-w-full md:max-w-[32rem] lg:max-w-[32rem] xl:max-w-[32rem] 2xl:max-w-[32rem]" role="menu" aria-orientation="vertical" aria-labelledby="notification-button" tabIndex="-1">
                     <div className="flex flex-col h-[80%] gap-2 mt-2 mb-2 px-2 overflow-auto" role="none">
-                        {notificationData.data.length > 0 ? (
-                            notificationData.data.map((notif) => (
+                        {notificationData.length > 0 ? (
+                            notificationData.map((notif) => (
                                 <button onClick={() => setNotifModalOpen({open: true, data: notif})} className={`flex justify-between ${notif.status === 0 ? 'bg-gray-100' : ''} ${notif.status === 0 ? '' : 'border'} rounded px-4 py-2 text-sm text-gray-700 hover:text-blue-500 transition-colors duration-300`} role="menuitem" tabIndex="-1" id="menu-item-0" key={notif.id}>
                                     <span key={notif.id} className="overflow-x-hidden whitespace-nowrap truncate">
                                         {notif.Pesan}
